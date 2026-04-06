@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sustainreport_ai/schemas/structure_index.schema.json",
+  "title": "Structure Index",
+  "description": "구조적 앵커 레지스트리. 모든 섹션/하위섹션/소제목의 고정 ID와 heading anchor를 관리한다. 프레임워크 인덱싱의 근간.",
+  "type": "object",
+  "required": [
+    "structure_version",
+    "project_id",
+    "entries"
+  ],
+  "properties": {
+    "structure_version": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-\\d{4}-[A-Z]+-\\d{3}$"
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/structure_entry"
+      }
+    }
+  },
+  "$defs": {
+    "structure_entry": {
+      "type": "object",
+      "required": [
+        "section_id",
+        "heading_text",
+        "heading_level",
+        "heading_anchor",
+        "toc_path"
+      ],
+      "properties": {
+        "section_id": {
+          "type": "string",
+          "pattern": "^(SEC-\\d+(\\.\\d+)*|SUB-SEC-\\d+(\\.\\d+)*-[A-Z])$",
+          "description": "고정 구조 ID. 한번 부여되면 변경하지 않음."
+        },
+        "parent_section_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "상위 섹션 ID. 최상위면 null."
+        },
+        "heading_text": {
+          "type": "string",
+          "description": "제목 텍스트. 변경 가능 (ID는 고정)."
+        },
+        "heading_level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "1=장, 2=절, 3=소절, 4=소제목, 5=하위소제목"
+        },
+        "heading_anchor": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "URL-safe 앵커 (예: ghg-emissions-scope1). 초안 본문의 <!-- anchor:SEC-X.Y --> 와 연동."
+        },
+        "toc_path": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "목차 경로 (예: ['환경', '기후변화 대응', '온실가스 배출량'])"
+        },
+        "draft_artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "초안 파일 경로 (예: 07_drafts/SEC-3.1.md)"
+        },
+        "framework_mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/framework_mapping"
+          },
+          "description": "이 구조에 매핑된 프레임워크 공시 항목"
+        }
+      }
+    },
+    "framework_mapping": {
+      "type": "object",
+      "required": [
+        "framework",
+        "disclosure",
+        "coverage_type"
+      ],
+      "properties": {
+        "framework": {
+          "type": "string",
+          "description": "프레임워크명 (GRI, TCFD, KSSB, ESRS, SASB 등)"
+        },
+        "disclosure": {
+          "type": "string",
+          "description": "공시 항목 코드 (예: 305-1, Metrics-a)"
+        },
+        "coverage_type": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "secondary",
+            "partial"
+          ],
+          "description": "primary=주요 위치, secondary=보조 참조, partial=부분 커버"
+        }
+      }
+    }
+  }
+}

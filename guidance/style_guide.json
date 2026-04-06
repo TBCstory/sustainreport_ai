@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "name": "ESG 보고서 문체 가이드",
+    "last_updated": "2026-04-02"
+  },
+  "voice_and_tone": {
+    "formality": "formal",
+    "perspective": "corporate",
+    "person": "third_person",
+    "tense": "present_and_past",
+    "examples": {
+      "good": ["당사는...", "회사는...", "그룹은..."],
+      "avoid": ["우리 회사는...", "저희는...", "우리의..."]
+    }
+  },
+  "sentence_structure": {
+    "max_length": "short",
+    "prefer_active_voice": true,
+    "avoid_split_infinitives": true,
+    "example": "온실가스 배출량을 15% 감축했습니다 → 배출량 15% 감축"
+  },
+  "terminology_rules": {
+    "company_reference": "당사|회사|그룹",
+    "past_tense_markers": [
+      "하였습니다",
+      "달성하였습니다",
+      "감축하였습니다",
+      "증가하였습니다"
+    ],
+    "numeric_expression": "수치: 숫자 사용, 단위: tCO2e, GWh 등"
+  },
+  "prohibition": {
+    "words_to_avoid": ["최첨단", "세계 최고", "유일", "무한한 가능성"],
+    "phrases_to_avoid": ["~이라고 확신합니다", "~할 것입니다"]
+  },
+  "kpi_presentation": {
+    "format": "{value} {unit}",
+    "context_required": "전년 대비 또는 목표 대비 backdrop 필요",
+    "uncertainty": "잠정|추정|기준값으로 표기"
+  }
+}

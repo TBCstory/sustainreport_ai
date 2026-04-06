@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gate_rules.json",
+  "title": "Gate Rules",
+  "description": "게이트 유형별 자동 vs 사람 승인 조건 정의",
+  "version": "1.1.0",
+  "gates": {
+    "P2_to_P3": {
+      "name": "P2→P3 Blueprint 승인 게이트",
+      "description": "writing_blueprint 승인 없이는 초안 작성 진입 불가",
+      "approval_type": "human",
+      "required_approvers": ["project_manager", "consultant_lead"],
+      "auto_conditions": [],
+      "blocking_conditions": [
+        { "type": "blueprint_not_approved", "severity": "blocker" },
+        { "type": "structure_index_missing", "severity": "blocker" }
+      ],
+      "can_override": false
+    },
+    "P5_to_P6": {
+      "name": "P5→P6 검수 승인 게이트",
+      "description": "내부 검수 및 팩트체크 완료 후 최종 초안 진행",
+      "approval_type": "human",
+      "required_approvers": ["consultant_lead", "quality_reviewer"],
+      "auto_conditions": [
+        { "type": "review_score_above", "threshold": 0.8 },
+        { "type": "no_blocking_issues_remaining" }
+      ],
+      "blocking_conditions": [
+        { "type": "critical_fact_errors", "severity": "blocker" },
+        { "type": "unresolved_conflicts", "severity": "blocker" }
+      ],
+      "can_override": true,
+      "override_requires": "senior_consultant_approval"
+    },
+    "auto_gate": {
+      "name": "자동 게이트 (기타 페이즈 전환)",
+      "description": "P0→P0.5, P0.5→P1, P1→P1.5, P3→P4, P4→P5, P6→P7 은 자동 처리",
+      "approval_type": "auto",
+      "required_approvers": [],
+      "applies_to": [
+        "P0_to_P0.5",
+        "P0.5_to_P1",
+        "P1_to_P1.5",
+        "P3_to_P4",
+        "P4_to_P5",
+        "P6_to_P7"
+      ],
+      "auto_conditions": [
+        { "type": "all_required_outputs_exist" },
+        { "type": "no_blocking_issues" }
+      ],
+      "blocking_conditions": [],
+      "can_override": false
+    },
+    "GATE-P05-TO-P1": {
+      "name": "인테이크 완료 게이트",
+      "from_phase": "P0.5",
+      "to_phase": "P1",
+      "auto_pass_conditions": [
+        {
+          "type": "file_exists",
+          "path": "{workspace}/00_definition/intake_manifest.json"
+        },
+        {
+          "type": "field_not_empty",
+          "field": "intake_manifest.A_structure.toc_style"
+        },
+        {
+          "type": "field_not_empty",
+          "field": "intake_manifest.A_structure.scope_inclusions"
+        }
+      ],
+      "human_approval_required": false,
+      "blocking_if_missing": ["intake_manifest.json"],
+      "notes": "자동 통과. intake_manifest가 없으면 차단."
+    },
+    "GATE-P15-TO-P2": {
+      "name": "목차 승인 게이트",
+      "from_phase": "P1.5",
+      "to_phase": "P2",
+      "auto_pass_conditions": [],
+      "human_approval_required": true,
+      "approval_prompt": "위 목차 초안을 승인하시겠습니까? 수정 사항이 있으면 말씀해주세요.",
+      "blocking_if_missing": ["toc_draft.json"],
+      "notes": "반드시 컨설턴트 명시 승인 필요. P2→P3 게이트와 동급 중요도."
+    }
+  },
+  "escalation_rules": {
+    "auto_escalate_after_hours": 48,
+    "escalation_path": ["project_manager", "senior_consultant"],
+    "reminder_interval_hours": 12
+  }
+}

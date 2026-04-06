@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "phase_rules.json",
+  "title": "Phase Rules",
+  "description": "P0~P7 워크플로우 페이즈 진입/종료 조건 및 필수 산출물 정의",
+  "version": "1.1.0",
+  "phases": {
+    "P0": {
+      "name": "프로젝트 정의",
+      "description": "프로젝트 기본 정보, 이해관계자, 목표 설정",
+      "entry_conditions": [],
+      "exit_conditions": [
+        {
+          "type": "file_exists",
+          "path": "{workspace}/00_definition/project_charter.json"
+        },
+        {
+          "type": "file_exists",
+          "path": "{workspace}/00_definition/stakeholder_matrix.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "00_definition/project_charter.json",
+          "description": "프로젝트 헌장"
+        },
+        {
+          "file": "00_definition/stakeholder_matrix.json",
+          "description": "이해관계자 매트릭스"
+        }
+      ],
+      "gate_required": false,
+      "next_phase": "P0.5"
+    },
+    "P0.5": {
+      "name": "인테이크 인터뷰",
+      "description": "컨설턴트와 구조화된 대화를 통해 보고서 작성 의사결정 사항 확정",
+      "entry_conditions": [
+        {
+          "type": "phase_complete",
+          "phase": "P0"
+        },
+        {
+          "type": "directory_exists",
+          "path": "{workspace}/01_raw/"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "file_exists",
+          "path": "{workspace}/00_definition/intake_manifest.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "00_definition/intake_manifest.json",
+          "description": "인테이크 매니페스트"
+        }
+      ],
+      "gate_required": false,
+      "gate_to_next": "GATE-P05-TO-P1",
+      "human_approval_required": false,
+      "next_phase": "P1",
+      "notes": "인테이크 결과가 없으면 P1 진입 불가"
+    },
+    "P1": {
+      "name": "자료 투입",
+      "description": "원본 파일 수집, 정규화, 세그먼트 추출",
+      "entry_conditions": [
+        {
+          "type": "gate_passed",
+          "gate_id": "GATE-P05-TO-P1"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "file_exists",
+          "path": "{workspace}/02_file_registry/file_registry.json"
+        },
+        {
+          "type": "file_exists",
+          "path": "{workspace}/04_segments/segment_manifest.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "01_raw/",
+          "description": "원본 파일 (불변)"
+        },
+        {
+          "file": "02_file_registry/file_registry.json",
+          "description": "파일 레지스트리"
+        },
+        {
+          "file": "03_normalized_md/",
+          "description": "정규화된 콘텐츠"
+        },
+        {
+          "file": "04_segments/segment_manifest.json",
+          "description": "세그먼트 매니페스트"
+        }
+      ],
+      "gate_required": false,
+      "next_phase": "P1.5"
+    },
+    "P1.5": {
+      "name": "목차 논의",
+      "description": "toc-planner가 목차 초안을 생성하고 컨설턴트 승인을 받는 단계",
+      "entry_conditions": [
+        {
+          "type": "phase_complete",
+          "phase": "P1"
+        },
+        {
+          "type": "file_exists",
+          "path": "{workspace}/02_file_registry/data_gap_report.json"
+        },
+        {
+          "type": "file_exists",
+          "path": "{workspace}/00_definition/intake_manifest.json"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "file_exists",
+          "path": "{workspace}/05_planning/toc_draft.json"
+        },
+        {
+          "type": "file_approved",
+          "path": "{workspace}/05_planning/toc_draft.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "05_planning/toc_draft.json",
+          "description": "목차 초안"
+        }
+      ],
+      "gate_required": true,
+      "gate_to_next": "GATE-P15-TO-P2",
+      "human_approval_required": true,
+      "approval_type": "toc_approval",
+      "next_phase": "P2",
+      "notes": "목차 승인 없이 writing_blueprint(P2) 진입 불가"
+    },
+    "P2": {
+      "name": "기획 (Blueprint)",
+      "description": "목차 설계, writing_blueprint 생성, 프레임워크 매핑",
+      "entry_conditions": [
+        {
+          "type": "gate_passed",
+          "gate_id": "GATE-P15-TO-P2"
+        },
+        {
+          "type": "minimum_segments",
+          "count": 1
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "file_exists",
+          "path": "{workspace}/05_planning/writing_blueprint.json"
+        },
+        {
+          "type": "file_exists",
+          "path": "{workspace}/05_planning/structure_index.json"
+        },
+        {
+          "type": "file_approved",
+          "path": "{workspace}/05_planning/writing_blueprint.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "05_planning/writing_blueprint.json",
+          "description": "섹션별 작성 계약서"
+        },
+        {
+          "file": "05_planning/structure_index.json",
+          "description": "구조 앵커 레지스트리"
+        },
+        {
+          "file": "05_planning/section_manifest.json",
+          "description": "섹션 매니페스트"
+        },
+        {
+          "file": "05_planning/framework_index.json",
+          "description": "프레임워크 인덱스"
+        }
+      ],
+      "gate_required": true,
+      "gate_type": "human",
+      "gate_id": "P2_to_P3",
+      "next_phase": "P3"
+    },
+    "P3": {
+      "name": "버킷 구축",
+      "description": "증거 라우팅, section_bucket 생성",
+      "entry_conditions": [
+        {
+          "type": "phase_approved",
+          "phase": "P2"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "all_buckets_exist",
+          "pattern": "06_buckets/SEC-*.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "06_buckets/SEC-*.json",
+          "description": "섹션별 증거 버킷"
+        }
+      ],
+      "gate_required": false,
+      "next_phase": "P4"
+    },
+    "P4": {
+      "name": "초안 작성",
+      "description": "증거 기반 섹션 초안 작성",
+      "entry_conditions": [
+        {
+          "type": "phase_complete",
+          "phase": "P3"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "all_sections_drafted",
+          "pattern": "07_drafts/SEC-*_meta.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "07_drafts/SEC-*.md",
+          "description": "초안 본문"
+        },
+        {
+          "file": "07_drafts/SEC-*_meta.json",
+          "description": "초안 메타"
+        }
+      ],
+      "gate_required": false,
+      "next_phase": "P5"
+    },
+    "P5": {
+      "name": "검수",
+      "description": "내부 팩트체크, 일관성 검수",
+      "entry_conditions": [
+        {
+          "type": "phase_complete",
+          "phase": "P4"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "review_complete",
+          "file": "08_review/internal_review_report.json"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "08_review/internal_review_report.json",
+          "description": "내부 검수 보고서"
+        },
+        {
+          "file": "08_review/fact_check_report.json",
+          "description": "팩트체크 보고서"
+        }
+      ],
+      "gate_required": true,
+      "gate_type": "human",
+      "gate_id": "P5_to_P6",
+      "next_phase": "P6"
+    },
+    "P6": {
+      "name": "초안 정리 및 핸드오프",
+      "description": "최종 초안 정리, 컨설턴트 검토용 패키지 구성",
+      "entry_conditions": [
+        {
+          "type": "phase_approved",
+          "phase": "P5"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "handoff_package_complete",
+          "path": "09_handoff/"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "09_handoff/draft_package.json",
+          "description": "핸드오프 패키지 메타"
+        },
+        {
+          "file": "09_handoff/",
+          "description": "정리된 초안 및 첨부 파일"
+        }
+      ],
+      "gate_required": false,
+      "next_phase": "P7"
+    },
+    "P7": {
+      "name": "증거 패키지",
+      "description": "감사 대비 증거 체인 구축",
+      "entry_conditions": [
+        {
+          "type": "phase_complete",
+          "phase": "P6"
+        }
+      ],
+      "exit_conditions": [
+        {
+          "type": "evidence_pack_complete",
+          "path": "10_evidence_pack/"
+        }
+      ],
+      "required_outputs": [
+        {
+          "file": "10_evidence_pack/evidence_chain.json",
+          "description": "증거 체인 문서"
+        },
+        {
+          "file": "10_evidence_pack/",
+          "description": "원본 참조 파일"
+        }
+      ],
+      "gate_required": false,
+      "next_phase": null
+    }
+  }
+}

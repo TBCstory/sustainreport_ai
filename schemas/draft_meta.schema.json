@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sustainreport_ai/schemas/draft_meta.schema.json",
+  "title": "Draft Meta",
+  "description": "섹션 초안의 메타데이터. 초안 작성 에이전트(section-writer)가 생성하며 run_handoff.py에서 소비.",
+  "type": "object",
+  "required": [
+    "section_id",
+    "draft_version",
+    "heading_ko",
+    "draft_confidence",
+    "evidence_segments",
+    "placeholders",
+    "missing_evidence",
+    "created_at"
+  ],
+  "properties": {
+    "section_id": {
+      "type": "string",
+      "pattern": "^SEC-\\d+(\\.\\d+)*$",
+      "description": "고정 구조 ID. 한번 부여되면 변경하지 않음."
+    },
+    "draft_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "초안 버전 번호. 수정 시 1씩 증가."
+    },
+    "heading_ko": {
+      "type": "string",
+      "description": "섹션 한국어 제목."
+    },
+    "heading_en": {
+      "type": ["string", "null"],
+      "default": null,
+      "description": "섹션 영어 제목 (선택)."
+    },
+    "draft_confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "초안 신뢰도 점수. 0=완전히 미확보, 1=완전히 확보."
+    },
+    "confidence_breakdown": {
+      "type": ["object", "null"],
+      "description": "신뢰도 분해.",
+      "properties": {
+        "evidence_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "증거 범위 충족도."
+        },
+        "numeric_completeness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "수치 데이터 완결성."
+        },
+        "framework_alignment": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "프레임워크 정렬도."
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence_segments": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SEG-\\d{5}$",
+        "description": "사용된 증거 세그먼트 ID."
+      },
+      "description": "초안에 반영된 SEG-NNNNN ID 목록."
+    },
+    "placeholders": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "placeholder 텍스트 문자열."
+      },
+      "description": "[확인필요] 등 미확보 내용 표시 문자열 배열."
+    },
+    "missing_evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "미확보 증거 설명 문자열."
+      },
+      "description": "초안에 반영되지 못한 데이터·사실 설명."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "초안 생성 일시 (ISO8601)."
+    },
+    "agent": {
+      "type": "string",
+      "default": "section-writer",
+      "description": "초안 작성 에이전트 ID."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft_complete",
+        "in_progress",
+        "review",
+        "approved",
+        "rejected"
+      ],
+      "default": "draft_complete",
+      "description": "초안 상태."
+    },
+    "word_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "초안 단어 수 (선택)."
+    },
+    "framework_alignment": {
+      "type": ["object", "null"],
+      "description": "프레임워크 코드 → 설명 매핑.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

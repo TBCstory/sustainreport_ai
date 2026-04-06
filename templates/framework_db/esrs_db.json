@@ -1,0 +1,200 @@
+{
+  "schema_version": "1.0",
+  "framework_name": "ESRS",
+  "framework_name_full_ko": "유럽 지속가능성보고서 표준",
+  "framework_name_full_en": "European Sustainability Reporting Standards",
+  "version": "2024",
+  "last_updated": "2024-01-01",
+  "source_url": "https://www.efrage.net/en/standards",
+  "description": "ESRS는 EU 지침에 따라 기업 지속가능성 보고서를 위한 유럽 표준입니다.",
+  "standards": [
+    {
+      "standard_id": "ESRS-1",
+      "name_ko": "일반 원칙",
+      "name_en": "General Principles",
+      "category": "general",
+      "data_point": [
+        "보고 원칙",
+        "재무제표와의 연결",
+        "지속가능성 성명서 구조"
+      ],
+      "disclosure_requirement": "기업의 지속가능성 보고서를 위한 기본 원칙 및 개념 프레임워크 규정",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-2",
+      "name_ko": "일반 보고 요구사항",
+      "name_en": "General Disclosures",
+      "category": "general",
+      "data_point": [
+        "비즈니스 모델",
+        " strategy 및 가치사슬",
+        "이해관계자 참여",
+        "중대성(실질성) 평가",
+        "보고 기준 및 원칙"
+      ],
+      "disclosure_requirement": "모든 기업에 적용되는 일반적인 보고 요구사항",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-E1",
+      "name_ko": "기후변화",
+      "name_en": "Climate Change",
+      "category": "environmental",
+      "data_point": [
+        "기후변화 관련 전략 및 비즈니스 모델",
+        "기후변화 관련 목표 및 진척 상황",
+        "GHG 배출량 (Scope 1, 2, 3)",
+        "에너지 소비 및 공급",
+        "기후변화 관련 전환 계획",
+        "자산 및 활동의 기후 회복력"
+      ],
+      "disclosure_requirement": "기후변화가 기업의 비즈니스 모델, 전략, 현금흐름, 자본비용, 자본조달에 미치는 영향과 기후변 대응 노력 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-E2",
+      "name_ko": "오염",
+      "name_en": "Pollution",
+      "category": "environmental",
+      "data_point": [
+        "대기 오염 물질 배출",
+        "수질 오염 물질 배출",
+        "토양 오염",
+        "유해물질 사용 및 관리",
+        "오염 관련 목표 및 진척 상황"
+      ],
+      "disclosure_requirement": "기업의 오염 물질 배출, 유해물질 관리 및 관련 목표 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-E3",
+      "name_ko": "수자원 및 해양자원",
+      "name_en": "Water and Marine Resources",
+      "category": "environmental",
+      "data_point": [
+        "물 소비량",
+        "물 스트레스 지역 물 취출량",
+        "수질 영향",
+        " 해양 생태계 영향",
+        "물 관련 목표 및 진척 상황"
+      ],
+      "disclosure_requirement": "수자원 및 해양자원의 사용, 관리, 수질 및 해양 생태계 영향 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-E4",
+      "name_ko": "생물다양성 및 생태계",
+      "name_en": "Biodiversity and Ecosystems",
+      "category": "environmental",
+      "data_point": [
+        "사업장 위치 및 생태계 영향 지역",
+        " 생물다양성 관련 전략 및 목표",
+        "종 다양성 영향",
+        "서식지 영향",
+        "토지 사용 변화",
+        "생태계 서비스 의존성"
+      ],
+      "disclosure_requirement": "생물다양성 및 생태계에 대한 기업의 의존성과 영향 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-E5",
+      "name_ko": "자원 사용 및 순환",
+      "name_en": "Resource Use and Circular Economy",
+      "category": "environmental",
+      "data_point": [
+        "원자재 소비",
+        "재활용 및 재사용률",
+        "폐기물 발생량 및 관리",
+        "순환 경제 전환 조치",
+        "자원 효율성 목표"
+      ],
+      "disclosure_requirement": "자원 사용 효율성, 폐기물 관리, 순환 경제 전환 노력 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-S1",
+      "name_ko": "자사의 인력",
+      "name_en": "Own Workforce",
+      "category": "social",
+      "data_point": [
+        "종업원 수 및 구성",
+        "급여 및 보상",
+        "노동 조건 (근로시간, 휴가 등)",
+        "노동 안전보건",
+        "업무와 삶의 균형",
+        "사회 대화",
+        "직원 역량 개발",
+        "동일 보수",
+        "인수 및 합병 시 근로조건"
+      ],
+      "disclosure_requirement": "자사 종업원의 근무조건, 안전보건, 역량 개발, 다양성 등 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-S2",
+      "name_ko": "가치사슬의 근로자",
+      "name_en": "Workers in the Value Chain",
+      "category": "social",
+      "data_point": [
+        "공급망 근로자 수 및 구성",
+        "공급망 근로자 근로조건",
+        "공급망 안전보건",
+        "공급망 노동권리",
+        "어린이 노동 및 강제 노동"
+      ],
+      "disclosure_requirement": "가치사슬(공급망 포함)에 있는 비종업원 근로자의 근무조건 및 권리 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-S3",
+      "name_ko": "지역사회의 영향을 받는 근로자",
+      "name_en": "Affected Communities",
+      "category": "social",
+      "data_point": [
+        "지역사회 영향 평가",
+        "지역사회의 경제적 영향",
+        "지역사회의 환경 영향",
+        "원주민 권리",
+        "이민자 및 취약계층",
+        "지역사회 참여 및 협의"
+      ],
+      "disclosure_requirement": "기업의 운영이 영향을 미치는 지역사회의 상황, 영향, 대응 노력 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-S4",
+      "name_ko": "소비자 및 최종사용자",
+      "name_en": "Consumers and End-users",
+      "category": "social",
+      "data_point": [
+        "소비자 안전 및 건강",
+        "소비자 정보 보호",
+        "제품 접근성",
+        "소비자 불만 및 권리 구제",
+        "마케팅 및 라벨링",
+        "개인정보 보호"
+      ],
+      "disclosure_requirement": "소비자 및 최종사용자의 안전, 건강, 정보 보호, 권리 공시",
+      "double_materiality": true
+    },
+    {
+      "standard_id": "ESRS-G1",
+      "name_ko": "사업 거버넌스",
+      "name_en": "Business Conduct",
+      "category": "governance",
+      "data_point": [
+        "기업 윤리 및Integrity",
+        "부패 및 뇌물 방지",
+        "정치적 참여 및 로비링",
+        "납세 행동",
+        "지급 연쇄 투명성",
+        "경쟁 저해 행위",
+        "supplier 계약 조건"
+      ],
+      "disclosure_requirement": "기업의 윤리, Integrity, Compliance, 부패방지, 공급망 관리 등 비즈니스 행동 공시",
+      "double_materiality": true
+    }
+  ]
+}

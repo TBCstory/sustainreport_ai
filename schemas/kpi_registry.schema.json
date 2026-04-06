@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sustainreport_ai/schemas/kpi_registry.schema.json",
+  "title": "KPI Registry Schema",
+  "description": "KPI 정의 레지스트리 — ESG 지표의 정의를 중앙 관리",
+  "$defs": {
+    "actual_value": {
+      "type": "object",
+      "required": ["year", "value", "data_quality"],
+      "properties": {
+        "year": {
+          "type": "integer"
+        },
+        "value": {
+          "type": "number"
+        },
+        "data_quality": {
+          "type": "string",
+          "enum": ["verified", "estimated", "restated"]
+        }
+      }
+    },
+    "kpi": {
+      "type": "object",
+      "required": [
+        "kpi_id",
+        "name",
+        "category",
+        "unit",
+        "calculation_method",
+        "data_source_type",
+        "scope",
+        "reporting_frequency",
+        "actual_values",
+        "connected_sections",
+        "framework_mappings"
+      ],
+      "properties": {
+        "kpi_id": {
+          "type": "string",
+          "pattern": "^KPI-[A-Z]{3}-\\d{3}$",
+          "description": "KPI 식별자 (예: KPI-ENV-001)"
+        },
+        "name": {
+          "type": "string",
+          "description": "KPI명"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["environmental", "social", "governance"]
+        },
+        "subcategory": {
+          "type": ["string", "null"],
+          "description": "하위 분류 (예: climate, water, biodiversity)"
+        },
+        "unit": {
+          "type": "string",
+          "description": "단위 (예: tCO2e, %, people)"
+        },
+        "calculation_method": {
+          "type": "string",
+          "description": "산출 방법 설명"
+        },
+        "data_source_type": {
+          "type": "string",
+          "enum": ["primary", "secondary", "estimated"]
+        },
+        "scope": {
+          "type": "string",
+          "description": "범위 (예: Scope 1, Scope 2, 전체)"
+        },
+        "reporting_frequency": {
+          "type": "string",
+          "enum": ["annual", "quarterly", "monthly"]
+        },
+        "target_value": {
+          "type": ["number", "null"]
+        },
+        "target_year": {
+          "type": ["integer", "null"]
+        },
+        "baseline_value": {
+          "type": ["number", "null"]
+        },
+        "baseline_year": {
+          "type": ["integer", "null"]
+        },
+        "actual_values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/actual_value"
+          }
+        },
+        "connected_sections": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^SEC-\\d+(\\.\\d+)*$"
+          }
+        },
+        "framework_mappings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "프레임워크 공개 코드 (GRI, TCFD, KSSB 등)"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": ["registry_version", "project_id", "kpis"],
+  "properties": {
+    "registry_version": {
+      "type": "string"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-\\d{4}-[A-Z]+-\\d{3}$"
+    },
+    "kpis": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/kpi"
+      }
+    }
+  }
+}

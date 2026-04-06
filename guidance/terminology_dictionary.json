@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "name": "ESG 보고서 용어 사전",
+    "last_updated": "2026-04-02"
+  },
+  "core_terms": {
+    "ESG": {
+      "term_ko": "환경·사회·지배구조",
+      "term_en": "Environmental, Social and Governance",
+      "usage": "ESG 경영, ESG 성과"
+    },
+    "지속가능경영": {
+      "term_ko": "지속가능경영",
+      "term_en": "Sustainability Management",
+      "usage": "지속가능경영 전략"
+    },
+    "Scope 1": {
+      "term_ko": "Scope 1 배출",
+      "term_en": "direct GHG emissions",
+      "usage": "직접 온실가스 배출량"
+    },
+    "Scope 2": {
+      "term_ko": "Scope 2 배출",
+      "term_en": "indirect GHG emissions (from purchased energy)",
+      "usage": "간접 온실가스 배출량 (외부 전기·열 등)"
+    },
+    "Scope 3": {
+      "term_ko": "Scope 3 배출",
+      "term_en": "other indirect GHG emissions",
+      "usage": "기타 간접 온실가스 배출량"
+    },
+    "탄소중립": {
+      "term_ko": "탄소중립",
+      "term_en": "carbon neutrality",
+      "usage": "탄소중립 달성"
+    },
+    "SBTi": {
+      "term_ko": "과학 기반 목표 이니셔티브",
+      "term_en": "Science Based Targets initiative",
+      "usage": "SBTi 인증"
+    },
+    "TCFD": {
+      "term_ko": "기후관련 재무정보 공개 태스크포스",
+      "term_en": "Task Force on Climate-related Financial Disclosures"
+    },
+    "GRI": {
+      "term_ko": "글로벌 보고서 이니셔티브",
+      "term_en": "Global Reporting Initiative"
+    },
+    "RE100": {
+      "term_ko": "재생에너지 100% 전환 이니셔티브",
+      "term_en": "Renewable Energy 100%",
+      "usage": "글로벌 재생에너지 100% 전환 목표"
+    }
+  },
+  "numeric_terms": {
+    "tCO2e": {
+      "unit_ko": "탄소당량 톤",
+      "description": "온실가스 배출량 단위"
+    },
+    "GWh": {
+      "unit_ko": "기가와트시",
+      "description": "에너지 소비량 단위"
+    },
+    "MW": {
+      "unit_ko": "메가와트",
+      "description": "발전 용량 단위"
+    },
+    "℃": {
+      "unit_ko": "섭씨",
+      "description": "온도 단위"
+    }
+  },
+  "industry_specific": {
+    "친환경 소재": {
+      "alternate_terms": ["환경친화적 소재", "에코 소재"],
+      "preferred": "친환경 소재"
+    },
+    "폐기물": {
+      "alternate_terms": ["산업폐기물", "생활폐기물"],
+      "preferred": "폐기물 (구분 필요시 한정어 표기)"
+    },
+    "재활용률": {
+      "alternate_terms": ["재활용율", "환산재활용률"],
+      "preferred": "재활용률"
+    }
+  },
+  "translation_notes": {
+    "korean_to_english": {
+      "지배구조": "Corporate Governance",
+      "사회공헌": "Community Engagement",
+      "안전보건": "Occupational Health and Safety"
+    }
+  }
+}

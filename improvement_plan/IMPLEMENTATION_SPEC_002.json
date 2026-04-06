@@ -1,0 +1,87 @@
+{
+  "plan_id": "SYSIMPROVE-2026-002",
+  "title": "sustainreport_ai 런타임 정합성 수정 — Phase/Gate 엔진·P1 통합·P1.5 분리·테스트·핸드오프 품질",
+  "created_at": "2026-04-06T00:00:00Z",
+  "created_by": "orchestrator",
+  "motivation": "SYSIMPROVE-2026-001에서 에이전트 프롬프트·오케스트레이션 규칙·스키마는 업데이트됐으나, 파이썬 런타임 코드(run_pipeline, state_manager, check_gate, run_ingestion, run_toc_planner)가 여전히 구 플로우를 사용 중. P0.5/P1.5가 실행 엔진에서 건너뛰어지고, OCR/HWP 변환이 메인 경로에서 미사용, toc_draft.json 생성 및 GATE-P15-TO-P2 승인 단계 없음.",
+  "predecessor_plan": "SYSIMPROVE-2026-001",
+  "plan_status": "completed",
+  "total_packets": 5,
+  "current_packet": "PKT-A001",
+  "packets": [
+    {
+      "packet_id": "PKT-A001",
+      "name": "Phase/Gate 런타임 정합성 수정",
+      "status": "done",
+      "completed_at": "2026-04-05T16:26:04Z",
+      "summary": "P0.5/P1.5 phase 및 GATE-P0.5-TO-P1/GATE-P1.5-TO-P2 게이트를 run_pipeline.py, state_manager.py, check_gate.py, update_project_state.py에 추가. 106 테스트 모두 통과.",
+      "spec_file": "PKT-A001_phase_gate_runtime.md",
+      "depends_on": [],
+      "estimated_effort": "large",
+      "priority": 1,
+      "description": "run_pipeline.py, state_manager.py, check_gate.py, update_project_state.py에 P0.5/P1.5 phase와 GATE-P0.5-TO-P1/GATE-P1.5-TO-P2 게이트를 실제 동작하도록 추가"
+    },
+    {
+      "packet_id": "PKT-A002",
+      "name": "P1 ingestion → normalize.py 통합 + data_gap_report.json 생성",
+      "status": "done",
+      "completed_at": "2026-04-05T16:40:13Z",
+      "summary": "run_ingestion.py의 run_markitdown() → process_single_file() 교체, normalize.py에 resolve_markitdown_command() 추가, data_gap_report.json 및 unconvertible_files.json 생성. 106 테스트 전체 통과.",
+      "spec_file": "PKT-A002_ingestion_normalize_integration.md",
+      "depends_on": ["PKT-A001"],
+      "estimated_effort": "large",
+      "priority": 2,
+      "description": "run_ingestion.py의 run_markitdown() 직접 호출을 normalize.process_single_file()로 교체하여 HWP/OCR 자동 라우팅 활성화. ingestion 완료 시 data_gap_report.json 및 unconvertible_files.json 생성."
+    },
+    {
+      "packet_id": "PKT-A003",
+      "name": "run_toc_planner.py P1.5 toc_draft 생성·승인 단계 분리",
+      "status": "done",
+      "completed_at": "2026-04-06T01:10:00Z",
+      "summary": "--toc-draft 모드新增, run_toc_draft() 함수新增, P1.5-TO-P2 게이트 체크新增, schemas/toc_draft.schema.json 생성. 1개 기존 테스트 실패 (skip_approval=True 환경에서 toc_draft 존재 불검증) — PKT-A004에서 수정 예정.",
+      "spec_file": "PKT-A003_toc_planner_p15_split.md",
+      "depends_on": ["PKT-A001"],
+      "estimated_effort": "large",
+      "priority": 2,
+      "description": "run_toc_planner.py를 2단계로 분리: (1) --toc-draft 모드: toc_draft.json 생성 후 GATE-P1.5-TO-P2 대기, (2) 기본 모드: GATE-P1.5-TO-P2 통과 확인 후 writing_blueprint/structure_index/section_manifest 생성 후 GATE-P2-TO-P3 대기."
+    },
+    {
+      "packet_id": "PKT-A004",
+      "name": "회귀 테스트 — 새 플로우 검증",
+      "status": "done",
+      "completed_at": "2026-04-06T01:30:00Z",
+      "summary": "test_phase_transitions.py 신규 생성 (9개 테스트), test_run_ingestion.py 3개 추가, test_run_toc_planner.py 3개 추가. 123 테스트 전체 통과.",
+      "spec_file": "PKT-A004_regression_tests.md",
+      "depends_on": ["PKT-A001", "PKT-A002", "PKT-A003"],
+      "estimated_effort": "medium",
+      "priority": 3,
+      "description": "PKT-A001~A003 구현을 검증하는 회귀 테스트 추가: P0.5/P1.5 phase transition, 새 게이트 동작, normalize.py 통합, toc_draft 생성/승인 흐름."
+    },
+    {
+      "packet_id": "PKT-A005",
+      "name": "핸드오프 품질 강화 — 컨설턴트용 체크리스트 자동 생성",
+      "status": "done",
+      "completed_at": "2026-04-06T02:00:00Z",
+      "summary": "run_handoff.py에 3개 함수 추가: _generate_placeholder_summary, _generate_data_gap_priority, _generate_consultant_review_checklist. 3개 파일 생성 확인, pytest 123개 전체 통과.",
+      "spec_file": "PKT-A005_handoff_quality.md",
+      "depends_on": ["PKT-A002", "PKT-A003"],
+      "estimated_effort": "medium",
+      "priority": 3,
+      "description": "run_handoff.py에 09_handoff/ 산출물 3종 추가: placeholder_summary.md(섹션별 미확인 항목 요약표), data_gap_priority.md(자료 부족 섹션 우선순위표), consultant_review_checklist.json(컨설턴트 확인 Top N 항목)."
+    }
+  ],
+  "key_principles": [
+    "문서/규칙과 런타임 코드의 일치를 최우선으로 한다",
+    "기존 테스트(106 passed)를 깨지 않으면서 새 기능을 추가한다",
+    "각 패킷 완료 시 pytest로 전체 스위트를 돌려 회귀를 확인한다",
+    "불확실한 결정이 생기면 실행을 중단하고 사용자에게 질문한다",
+    "원본 파일 수정 전 .bak 백업을 반드시 생성한다"
+  ],
+  "completion_criteria": {
+    "PKT-A001": "uv run python scripts/run_pipeline.py --workspace <ws> --dry-run 실행 시 P0.5_to_P1, P1.5_to_P2 게이트가 목록에 출력됨. update_project_state.py 실행 시 P0.5/P1.5 phase가 정확히 계산됨.",
+    "PKT-A002": "run_ingestion.py 실행 후 03_normalized_md/ 파일에 YAML conversion_method가 kordoc/ocr_fallback/markitdown 중 정확한 값으로 기록됨. 02_file_registry/data_gap_report.json 생성 확인.",
+    "PKT-A003": "run_toc_planner.py --toc-draft 실행 후 05_planning/toc_draft.json 생성 + approval_gates.json에 GATE-P1.5-TO-P2 waiting 기록. toc_draft 미승인 상태에서 run_toc_planner.py(기본 모드) 실행 시 오류 반환.",
+    "PKT-A004": "pytest tests/ 전체 통과. 새로 추가된 테스트 중 P0.5/P1.5/toc_draft/data_gap 관련 케이스 모두 green.",
+    "PKT-A005": "run_handoff.py 실행 후 09_handoff/placeholder_summary.md, data_gap_priority.md, consultant_review_checklist.json 3개 파일 생성 확인."
+  }
+}

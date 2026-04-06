@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sustainreport_ai/schemas/draft_queries.schema.json",
+  "title": "Draft Query Tracker",
+  "description": "초안 질문 트래커 — 증거 부족·불확실성-placeholder를 추적",
+  "type": "object",
+  "required": ["query_version", "project_id", "queries"],
+  "properties": {
+    "query_version": {
+      "type": "string",
+      "description": "쿼리 트래커 버전"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-\\d{4}-[A-Z]+-\\d{3}$",
+      "description": "프로젝트 ID"
+    },
+    "queries": {
+      "type": "array",
+      "description": "초안 질문 목록",
+      "items": {
+        "$ref": "#/$defs/DraftQuery"
+      }
+    }
+  },
+  "$defs": {
+    "DraftQuery": {
+      "type": "object",
+      "description": "개별 초안 질문",
+      "required": [
+        "dq_id",
+        "section_id",
+        "question",
+        "status",
+        "priority",
+        "raised_by",
+        "raised_at"
+      ],
+      "properties": {
+        "dq_id": {
+          "type": "string",
+          "pattern": "^DQ-\\d{3}$",
+          "description": "Draft Query ID"
+        },
+        "section_id": {
+          "type": "string",
+          "description": "연관 섹션 ID"
+        },
+        "question": {
+          "type": "string",
+          "description": "질문 내용"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "in_progress", "resolved", "accepted_placeholder", "escalated"],
+          "description": "질문 처리 상태"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "우선순위"
+        },
+        "raised_by": {
+          "type": "string",
+          "description": "질문 제기 에이전트 ID"
+        },
+        "raised_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "질문 제기 일시"
+        },
+        "resolved_by": {
+          "type": ["string", "null"],
+          "description": "해결 에이전트 ID"
+        },
+        "resolved_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "해결 일시"
+        },
+        "resolution_note": {
+          "type": ["string", "null"],
+          "description": "해결 참고 사항"
+        },
+        "evidence_refs": {
+          "type": ["array", "null"],
+          "description": "관련 증거 파일 ID 목록",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

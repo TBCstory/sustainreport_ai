@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sustainreport_ai/schemas/framework_index.schema.json",
+  "title": "Framework Index",
+  "description": "프레임워크 인덱스 — GRI/TCFD/KSSB/ESRS/SASB별 공시 요구사항 매핑",
+  "type": "object",
+  "required": [
+    "index_version",
+    "project_id",
+    "frameworks"
+  ],
+  "properties": {
+    "index_version": {
+      "type": "string",
+      "description": "인덱스 스키마 버전"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^PRJ-\\d{4}-[A-Z]+-\\d{3}$",
+      "description": "프로젝트 ID (예: PRJ-2024-ESG-001)"
+    },
+    "frameworks": {
+      "type": "array",
+      "description": "프레임워크 목록",
+      "items": {
+        "$ref": "#/$defs/framework"
+      }
+    }
+  },
+  "$defs": {
+    "framework": {
+      "type": "object",
+      "required": [
+        "framework_code",
+        "framework_name",
+        "disclosures"
+      ],
+      "properties": {
+        "framework_code": {
+          "type": "string",
+          "enum": [
+            "GRI",
+            "TCFD",
+            "KSSB",
+            "ESRS",
+            "SASB",
+            "ISSB",
+            "KSSB_S2",
+            "UN_GC",
+            "SDG"
+          ],
+          "description": "프레임워크 코드"
+        },
+        "framework_name": {
+          "type": "string",
+          "description": "프레임워크 완전한 이름"
+        },
+        "version": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "가이드 버전"
+        },
+        "disclosures": {
+          "type": "array",
+          "description": "공시 요구사항 목록",
+          "items": {
+            "$ref": "#/$defs/disclosure"
+          }
+        }
+      }
+    },
+    "disclosure": {
+      "type": "object",
+      "required": [
+        "disclosure_code",
+        "title",
+        "requirement_level",
+        "sections_covering",
+        "coverage_status",
+        "data_available"
+      ],
+      "properties": {
+        "disclosure_code": {
+          "type": "string",
+          "description": "공시 코드 (예: 305-1, CC-a, E1-1)"
+        },
+        "title": {
+          "type": "string",
+          "description": "공시 제목"
+        },
+        "requirement_level": {
+          "type": "string",
+          "enum": [
+            "mandatory",
+            "recommended",
+            "optional"
+          ],
+          "description": "요구 수준"
+        },
+        "sections_covering": {
+          "type": "array",
+          "description": "이 공시를 커버하는 섹션 ID 목록",
+          "items": {
+            "type": "string"
+          }
+        },
+        "coverage_status": {
+          "type": "string",
+          "enum": [
+            "full",
+            "partial",
+            "not_covered"
+          ],
+          "description": "커버리지 상태"
+        },
+        "data_available": {
+          "type": "boolean",
+          "description": "데이터 가용성"
+        },
+        "evidence_refs": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "description": "증거 파일 ID 목록",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "메모"
+        }
+      }
+    }
+  }
+}

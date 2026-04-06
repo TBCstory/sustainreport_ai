@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agent_runtime_policy.json",
+  "title": "Agent Runtime Policy",
+  "description": "에이전트의 실행 모드, 수명 주기, 범위, 컨텍스트 관리 정책을 정의한다.",
+  "version": "1.0.0",
+  "runtime_modes": {
+    "persistent": {
+      "description": "프로젝트 전 생애주기 동안 유지되는 에이전트. 세션 간 상태 공유.",
+      "characteristics": [
+        "workspace/ 디렉토리에 상태 파일 유지",
+        "project_state.json 갱신 의무",
+        "checkpoint 기반 복구 가능",
+        "동일 섹션에 대해 재진입 시 기존 상태 참조"
+      ],
+      "use_cases": [
+        "toc-planner (per project)",
+        "section-writer (per section-group)",
+        "internal-reviewer (per project)"
+      ]
+    },
+    "ephemeral": {
+      "description": "단일 작업 완료를 위해 스핀업되고, 완료 후 종료되는 에이전트.",
+      "characteristics": [
+        "상태를 파일로 출력 후 종료",
+        "이전 실행 상태를 기억하지 않음",
+        "필요 시 새로 스핀업",
+        "컨텍스트 창은 해당 작업에만 최적화"
+      ],
+      "use_cases": [
+        "data-analyst",
+        "framework-mapper",
+        "fact-checker",
+        "provenance-builder"
+      ]
+    }
+  },
+  "agents": {
+    "data-analyst": {
+      "runtime_mode": "ephemeral",
+      "lifecycle": {
+        "start": "파일 투입 요청 시",
+        "end": "file_registry 갱신 + normalized_md 생성 완료 시",
+        "timeout_minutes": 30
+      },
+      "scope": {
+        "max_files_per_run": 50,
+        "max_file_size_mb": 100,
+        "supported_formats": ["pdf", "docx", "hwp", "xlsx", "csv", "txt", "md"]
+      },
+      "context_policy": {
+        "max_context_segments": 20,
+        "reuse_normalized": true,
+        "skip_on_cache_hit": true
+      },
+      "checkpoint": null,
+      "isolation": "workspace 별 격리"
+    },
+    "toc-planner": {
+      "runtime_mode": "persistent",
+      "lifecycle": {
+        "start": "P1 완료 후 또는 기존 프로젝트 로드 시",
+        "end": "P2 게이트 승인 후 (아직 종료하지 않음, P3-P5 대기)",
+        "timeout_minutes": null,
+        "note": "프로젝트 기간 동안 유지, 필요 시 재진입"
+      },
+      "scope": {
+        "max_sections": 50,
+        "structure_depth_limit": 5
+      },
+      "context_policy": {
+        "maintain_session_state": true,
+        "checkpoint_interval_minutes": 10,
+        "persist_to": "project_state.json"
+      },
+      "checkpoint": {
+        "enabled": true,
+        "path": "context_bus/toc_planner_checkpoint.json",
+        "restore_on_reentry": true
+      },
+      "isolation": "프로젝트별 인스턴스"
+    },
+    "framework-mapper": {
+      "runtime_mode": "ephemeral",
+      "lifecycle": {
+        "start": "P2 단계에서 structure_index 생성 후",
+        "end": "framework_index.json 생성 완료 시",
+        "timeout_minutes": 20
+      },
+      "scope": {
+        "frameworks": ["GRI", "TCFD", "KSSB", "ESRS", "SASB"],
+        "max_mappings_per_section": 10
+      },
+      "context_policy": {
+        "reuse_segment_analysis": true
+      },
+      "checkpoint": null,
+      "isolation": "workspace 별 격리"
+    },
+    "section-writer": {
+      "runtime_mode": "persistent",
+      "lifecycle": {
+        "start": "P3 버킷 구축 완료 후 (섹션 그룹별)",
+        "end": "P4 모든 섹션 초안 완료 또는 P5 진입 시",
+        "timeout_minutes": null,
+        "note": "섹션 그룹별로 분기 실행 가능"
+      },
+      "scope": {
+        "sections_per_instance": "1-5 (그룹화 가능)",
+        "parallel_execution": true,
+        "max_concurrent_sections": 3
+      },
+      "context_policy": {
+        "maintain_bucket_context": true,
+        "reuse_blueprint": true,
+        "checkpoint_per_section": true
+      },
+      "checkpoint": {
+        "enabled": true,
+        "path": "context_bus/section_writer_checkpoint_{section_group}.json",
+        "restore_on_reentry": true
+      },
+      "isolation": "섹션 그룹별 격리"
+    },
+    "internal-reviewer": {
+      "runtime_mode": "persistent",
+      "lifecycle": {
+        "start": "P4 섹션 초안 완료 시",
+        "end": "P5 게이트 승인 또는 리뷰 반복 완료 시",
+        "timeout_minutes": null
+      },
+      "scope": {
+        "review_depth": "full",
+        "parallel_section_review": true
+      },
+      "context_policy": {
+        "accumulate_issues": true,
+        "cross_reference_sections": true
+      },
+      "checkpoint": {
+        "enabled": true,
+        "path": "context_bus/internal_reviewer_checkpoint.json",
+        "restore_on_reentry": true
+      },
+      "isolation": "프로젝트별 인스턴스"
+    },
+    "fact-checker": {
+      "runtime_mode": "ephemeral",
+      "lifecycle": {
+        "start": "P5 단계에서 internal-reviewer 요청 시",
+        "end": "fact_check_report.json 생성 완료 시",
+        "timeout_minutes": 30
+      },
+      "scope": {
+        "priority_sources": "SEG 원본 + 01_raw/",
+        "verify_conflicts_only": false,
+        "full_verification_threshold": 0.8
+      },
+      "context_policy": {
+        "reuse_segment_manifest": true
+      },
+      "checkpoint": null,
+      "isolation": "workspace 별 격리"
+    },
+    "provenance-builder": {
+      "runtime_mode": "ephemeral",
+      "lifecycle": {
+        "start": "P7 단계에서 증거 패키지 조립 시작",
+        "end": "evidence_chain.json 생성 완료 시",
+        "timeout_minutes": 20
+      },
+      "scope": {
+        "trace_all_sources": true,
+        "include_calculations": true,
+        "archive_originals": true
+      },
+      "context_policy": {
+        "scan_all_drafts": true,
+        "cross_reference_buckets": true
+      },
+      "checkpoint": null,
+      "isolation": "workspace 별 격리"
+    }
+  },
+  "context_management": {
+    "global": {
+      "max_context_tokens": 200000,
+      "warning_threshold_percent": 80,
+      "eviction_policy": "oldest_unused_section_first"
+    },
+    "per_agent": {
+      "persistent": {
+        "keep_in_memory": ["current_section", "blueprint", "structure_index"],
+        "evict_to_disk": ["completed_drafts", "review_reports"]
+      },
+      "ephemeral": {
+        "keep_in_memory": ["current_task"],
+        "evict_immediately": ["completed_output"]
+      }
+    }
+  },
+  "resource_limits": {
+    "max_parallel_agents": 5,
+    "max_total_tokens_per_hour": 1000000,
+    "burst_limit": 10
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "context_sync_rules.json",
+  "title": "Context Sync Rules",
+  "description": "Baseline triggers for refreshing persistent agent context when project artifacts change.",
+  "version": "0.1.0",
+  "default_policy": {
+    "action": "resync",
+    "severity": "warning"
+  },
+  "sync_rules": [
+    {
+      "trigger": "blueprint_change",
+      "affected_roles": ["toc-planner", "section-writer"],
+      "action": "resync",
+      "resync_method": "inject_updated_artifact",
+      "severity": "blocking"
+    },
+    {
+      "trigger": "style_guide_change",
+      "affected_roles": ["section-writer", "internal-reviewer"],
+      "action": "resync",
+      "resync_method": "inject_updated_artifact",
+      "severity": "warning"
+    },
+    {
+      "trigger": "bucket_rebuild",
+      "affected_roles": ["section-writer"],
+      "action": "dispose_and_recreate",
+      "resync_method": "reload_section_bucket",
+      "severity": "blocking"
+    },
+    {
+      "trigger": "approval_gate_decision",
+      "affected_roles": ["toc-planner", "internal-reviewer"],
+      "action": "resync",
+      "resync_method": "refresh_gate_state",
+      "severity": "warning"
+    }
+  ]
+}

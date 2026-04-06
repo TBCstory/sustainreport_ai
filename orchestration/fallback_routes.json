@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "fallback_routes.json",
+  "title": "Fallback Routes",
+  "description": "Baseline operator routes for known runtime failures until deeper runtime wiring is implemented.",
+  "version": "0.1.0",
+  "routes": [
+    {
+      "failure_type": "planner_parse_failure",
+      "applies_to": ["P2", "scripts/run_toc_planner.py"],
+      "route": "persist_raw_output_and_raise_actionable_error",
+      "operator_action": "Capture the raw planner output, keep the approval gate closed, and log the parser failure in the handoff notes.",
+      "creates_blocking_issue": true
+    },
+    {
+      "failure_type": "approval_wait_timeout",
+      "applies_to": ["P2_to_P3", "P5_to_P6"],
+      "route": "stay_waiting_and_emit_next_action",
+      "operator_action": "Keep the gate in waiting status, surface missing approvers in next actions, and do not force phase advancement.",
+      "creates_blocking_issue": false
+    },
+    {
+      "failure_type": "markitdown_resolution_failure",
+      "applies_to": ["P1", "scripts/run_ingestion.py"],
+      "route": "retry_with_resolved_binary_then_stop",
+      "operator_action": "Retry with the interpreter sibling or repo-local .venv binary before PATH; if it still fails, stop and document the environment gap.",
+      "creates_blocking_issue": true
+    },
+    {
+      "failure_type": "state_summary_mismatch",
+      "applies_to": [
+        "scripts/update_project_state.py",
+        "scripts/rebuild_summaries.py",
+        "llm/cli.py"
+      ],
+      "route": "rebuild_summaries_then_compare_live_snapshot",
+      "operator_action": "Regenerate summaries, compare the live phase snapshot with gate evaluation, and hand off any remaining divergence with fixture details.",
+      "creates_blocking_issue": true
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session_registry.json",
+  "title": "Session Registry",
+  "description": "Persistent agent session tracking baseline for orchestration recovery.",
+  "version": "0.1.0",
+  "status_values": ["active", "stale", "closed", "errored"],
+  "session_record_contract": {
+    "required_fields": [
+      "session_id",
+      "agent_role",
+      "scope",
+      "runtime",
+      "created_at",
+      "last_active_at",
+      "context_version",
+      "status",
+      "resync_required",
+      "resume_allowed"
+    ],
+    "optional_fields": [
+      "artifact_versions",
+      "workspace_snapshot_version",
+      "last_resync_at",
+      "staleness_reason",
+      "notes"
+    ]
+  },
+  "sessions": []
+}

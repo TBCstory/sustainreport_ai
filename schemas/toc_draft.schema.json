@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "toc_draft",
+  "description": "P1.5 목차 초안 — 컨설턴트 승인 대기",
+  "type": "object",
+  "required": ["project_id", "generated_at", "status", "sections"],
+  "properties": {
+    "project_id": { "type": "string" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "approved", "rejected"],
+      "description": "draft: 초안, approved: 컨설턴트 승인 완료, rejected: 재작성 필요"
+    },
+    "approved_at": { "type": ["string", "null"], "format": "date-time" },
+    "approved_by": { "type": ["string", "null"] },
+    "rejection_reason": { "type": ["string", "null"] },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "heading_text", "level"],
+        "properties": {
+          "section_id": { "type": "string", "pattern": "^SEC-" },
+          "heading_text": { "type": "string" },
+          "level": { "type": "integer", "minimum": 1, "maximum": 4 },
+          "parent_section_id": { "type": ["string", "null"] },
+          "estimated_pages": { "type": ["integer", "null"] },
+          "frameworks": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "관련 프레임워크 (GRI, TCFD, KSSB 등)"
+          },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "consultant_notes": { "type": ["string", "null"] },
+    "revision_history": { "type": "array", "items": { "type": "object" } }
+  }
+}

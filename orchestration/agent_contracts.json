@@ -1,0 +1,395 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agent_contracts.json",
+  "title": "Agent Contracts",
+  "description": "에이전트별 입출력 계약 정의. 각 에이전트의 역할, 읽기/쓰기 파일, 작업 규칙을 명시한다.",
+  "version": "1.0.0",
+  "agents": {
+    "data-analyst": {
+      "role": "파일 투입·정규화·중복탐지·세그먼트 추출",
+      "runtime_mode": "ephemeral",
+      "input_contracts": {
+        "required": [
+          {
+            "path": "{workspace}/01_raw/",
+            "purpose": "원본 파일 참조",
+            "format": "raw_binary"
+          },
+          {
+            "path": "{workspace}/02_file_registry/file_registry.json",
+            "purpose": "파일 추적 매니페스트",
+            "format": "json"
+          }
+        ],
+        "optional": []
+      },
+      "output_contracts": [
+        {
+          "path": "{workspace}/02_file_registry/file_registry.json",
+          "format": "json",
+          "description": "파일 레지스트리 (메타+중복탐지 결과)"
+        },
+        {
+          "path": "{workspace}/03_normalized_md/F-NNNN.md",
+          "format": "markdown",
+          "description": "정규화된 콘텐츠 (markitdown 변환)"
+        },
+        {
+          "path": "{workspace}/04_segments/segment_manifest.json",
+          "format": "json",
+          "description": "세그먼트 매니페스트"
+        }
+      ],
+      "work_rules": [
+        "01_raw/ 파일은 절대 수정하지 않음 (불변 원본)",
+        "중복 파일은 file_registry에 duplicated: true 표시",
+        "markitdown 변환 실패 시 original_format 유지",
+        "세그먼트 추출 시 SEG-NNNNN ID 체계 사용"
+      ],
+      "prohibitions": [
+        "원본 파일 내용 직접 수정 금지",
+        "증거 없는 수치/사실 생성 금지",
+        " hallucination 방지: 변환 불확실성 명시"
+      ]
+    },
+    "toc-planner": {
+      "role": "목차·구조 설계, writing_blueprint 생성",
+      "runtime_mode": "persistent",
+      "input_contracts": {
+        "required": [
+          {
+            "path": "{workspace}/04_segments/segment_manifest.json",
+            "purpose": "세그먼트 현황",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/00_definition/project_charter.json",
+            "purpose": "프로젝트 목표·범위",
+            "format": "json"
+          },
+          {
+            "path": "guidance/style_guide.json",
+            "purpose": "문체 가이드",
+            "format": "json"
+          },
+          {
+            "path": "guidance/terminology_dictionary.json",
+            "purpose": "용어 통일",
+            "format": "json"
+          }
+        ],
+        "optional": [
+          {
+            "path": "{workspace}/05_planning/framework_index.json",
+            "purpose": "프레임워크 매핑 (기존)",
+            "format": "json"
+          }
+        ]
+      },
+      "output_contracts": [
+        {
+          "path": "{workspace}/05_planning/toc_draft.json",
+          "format": "json",
+          "description": "목차 초안 (컨설턴트 승인 전, consultant_approval: pending → approved)"
+        },
+        {
+          "path": "{workspace}/05_planning/structure_index.json",
+          "format": "json",
+          "description": "구조 앵커 레지스트리"
+        },
+        {
+          "path": "{workspace}/05_planning/writing_blueprint.json",
+          "format": "json",
+          "description": "섹션별 작성 계약서"
+        },
+        {
+          "path": "{workspace}/05_planning/section_manifest.json",
+          "format": "json",
+          "description": "섹션 매니페스트"
+        }
+      ],
+      "work_rules": [
+        "section_id는 SEC-X.Y.Z 체계 사용 (고정, 변경 불가)",
+        "heading_anchor는 URL-safe 소문자+하이픈",
+        "writing_blueprint.depth_level = 1~4로 섹션 깊이 지정",
+        "flexibility_mode: rigid/flex/manual 구분",
+        "fallback_if_evidence_missing 정책 필수 설정"
+      ],
+      "prohibitions": [
+        "writing_blueprint 승인 없이 P3 진입시키지 않기",
+        "증거 없는 섹션 구조 확정 금지",
+        "Blueprt 미승인 상태로 덮어쓰기 금지"
+      ]
+    },
+    "framework-mapper": {
+      "role": "프레임워크 매핑 (GRI/TCFD/KSSB/ESRS/SASB 등)",
+      "runtime_mode": "ephemeral",
+      "input_contracts": {
+        "required": [
+          {
+            "path": "{workspace}/05_planning/structure_index.json",
+            "purpose": "구조 인덱스",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/04_segments/segment_manifest.json",
+            "purpose": "세그먼트 현황",
+            "format": "json"
+          }
+        ],
+        "optional": [
+          {
+            "path": "templates/framework_db/",
+            "purpose": "프레임워크별 공시 항목 DB",
+            "format": "directory"
+          }
+        ]
+      },
+      "output_contracts": [
+        {
+          "path": "{workspace}/05_planning/framework_index.json",
+          "format": "json",
+          "description": "프레임워크 인덱스"
+        }
+      ],
+      "work_rules": [
+        "coverage_type: primary/secondary/partial 구분",
+        "section_id와 disclosure_code 매핑",
+        "중복 공시 항목은 coverage_type으로 우선순위 결정"
+      ],
+      "prohibitions": [
+        "출처 없는 프레임워크 공시 항목 추가 금지",
+        "매핑 근거 없이 primary 지정 금지"
+      ]
+    },
+    "section-writer": {
+      "role": "증거 기반 섹션 초안 작성",
+      "runtime_mode": "persistent",
+      "per_section": true,
+      "input_contracts": {
+        "required": [
+          {
+            "path": "{workspace}/05_planning/writing_blueprint.json",
+            "purpose": "섹션별 깊이·방식·제약",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/05_planning/structure_index.json",
+            "purpose": "구조 ID, heading_anchor, toc_path",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/06_buckets/SEC-X.Y.json",
+            "purpose": "라우팅된 증거 세그먼트",
+            "format": "json"
+          },
+          {
+            "path": "guidance/style_guide.json",
+            "purpose": "문체·어미·인칭",
+            "format": "json"
+          },
+          {
+            "path": "guidance/terminology_dictionary.json",
+            "purpose": "용어 통일",
+            "format": "json"
+          }
+        ],
+        "optional": [
+          {
+            "path": "{workspace}/03_normalized_md/F-NNNN.md",
+            "purpose": "원본 정규화 콘텐츠 (세그먼트 원문 확인)",
+            "format": "markdown"
+          },
+          {
+            "path": "{workspace}/05_planning/kpi_definition_registry.json",
+            "purpose": "KPI 확정 상태 (수치 섹션)",
+            "format": "json"
+          }
+        ]
+      },
+      "output_contracts": [
+        {
+          "path": "{workspace}/07_drafts/SEC-X.Y.md",
+          "format": "markdown",
+          "description": "초안 본문"
+        },
+        {
+          "path": "{workspace}/07_drafts/SEC-X.Y_meta.json",
+          "format": "json",
+          "description": "초안 메타 (confidence, placeholders, issues)"
+        }
+      ],
+      "work_rules": [
+        "모든 heading에 <!-- anchor:SEC-X.Y.Z --> 태그 필수",
+        "모든 사실/수치 문장에 <!-- src:SEG-NNNNN@vN --> 또는 <!-- src:CALC-NNNN --> 태그 필수",
+        "evidence 없는 문장 작성 금지 → [확인필요: {구체적 이유}] placeholder 사용",
+        "KPI provisional = (잠정) 표기, unresolved = placeholder",
+        "depth_level/expected_length_range 준수",
+        "작업 완료 후 log_event.py 호출 필수"
+      ],
+      "prohibitions": [
+        "증거 없는 수치 생성 금지",
+        "provenance 태그 없는 사실/수치 문장 작성 금지",
+        "anchor 태그 없는 heading 작성 금지",
+        "blueprint 제약 무시 금지"
+      ]
+    },
+    "internal-reviewer": {
+      "role": "내부 팩트체크·일관성 검수",
+      "runtime_mode": "persistent",
+      "input_contracts": {
+        "required": [
+          {
+            "path": "{workspace}/07_drafts/SEC-*_meta.json",
+            "purpose": "모든 초안 메타",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/05_planning/writing_blueprint.json",
+            "purpose": "Blueprint 제약",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/05_planning/structure_index.json",
+            "purpose": "구조 일관성",
+            "format": "json"
+          },
+          {
+            "path": "guidance/terminology_dictionary.json",
+            "purpose": "용어 일관성",
+            "format": "json"
+          },
+          {
+            "path": "guidance/style_guide.json",
+            "purpose": "문체 일관성",
+            "format": "json"
+          }
+        ],
+        "optional": []
+      },
+      "output_contracts": [
+        {
+          "path": "{workspace}/08_review/internal_review_report.json",
+          "format": "json",
+          "description": "내부 검수 보고서"
+        }
+      ],
+      "work_rules": [
+        "section 간 용어 일관성 검증",
+        "structural_index heading_anchor 중복 체크",
+        "placeholder 남용 감지 → threshold: 5개/section 이상 시 경고",
+        "confidence 점수 기반 검수 우선순위 결정"
+      ],
+      "prohibitions": [
+        "수정 없이 초안을 승인 처리 금지",
+        "evidence 없는 수정 제안 금지"
+      ]
+    },
+    "fact-checker": {
+      "role": "외부 검증 (공시 기준, 규제 대비)",
+      "runtime_mode": "ephemeral",
+      "input_contracts": {
+        "required": [
+          {
+            "path": "{workspace}/07_drafts/SEC-*_meta.json",
+            "purpose": "초안 메타 (source_conflicts)",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/04_segments/segment_manifest.json",
+            "purpose": "세그먼트 출처",
+            "format": "json"
+          },
+          {
+            "path": "guidance/style_guide.json",
+            "purpose": "문체 규칙",
+            "format": "json"
+          },
+          {
+            "path": "guidance/terminology_dictionary.json",
+            "purpose": "용어 통일",
+            "format": "json"
+          }
+        ],
+        "optional": [
+          {
+            "path": "{workspace}/01_raw/",
+            "purpose": "원본 파일 재확인",
+            "format": "directory"
+          }
+        ]
+      },
+      "output_contracts": [
+        {
+          "path": "{workspace}/08_review/fact_check_report.json",
+          "format": "json",
+          "description": "팩트체크 보고서"
+        }
+      ],
+      "work_rules": [
+        "source_conflicts 항목 우선 검증",
+        "SEG 원본 vs 초안 활용 표현 일치 여부",
+        "핵심 수치 (KPI 관련) 전수 검증"
+      ],
+      "prohibitions": [
+        "단일 소스만으로 사실 확증 금지",
+        "추정/계산 값을 사실로 표시 금지"
+      ]
+    },
+    "provenance-builder": {
+      "role": "증거 체인 구축·evidence pack 조립",
+      "runtime_mode": "ephemeral",
+      "input_contracts": {
+        "required": [
+          {
+            "path": "{workspace}/07_drafts/SEC-*_meta.json",
+            "purpose": "모든 초안 메타",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/04_segments/segment_manifest.json",
+            "purpose": "세그먼트 Provenance",
+            "format": "json"
+          },
+          {
+            "path": "{workspace}/02_file_registry/file_registry.json",
+            "purpose": "파일 혈통(lineage)",
+            "format": "json"
+          },
+          {
+            "path": "guidance/style_guide.json",
+            "purpose": "문체 규칙",
+            "format": "json"
+          },
+          {
+            "path": "guidance/terminology_dictionary.json",
+            "purpose": "용어 통일",
+            "format": "json"
+          }
+        ],
+        "optional": []
+      },
+      "output_contracts": [
+        {
+          "path": "{workspace}/10_evidence_pack/evidence_chain.json",
+          "format": "json",
+          "description": "증거 체인 문서"
+        },
+        {
+          "path": "{workspace}/10_evidence_pack/",
+          "description": "원본 참조 파일 아카이브",
+          "format": "directory"
+        }
+      ],
+      "work_rules": [
+        "초안의 src:SEG-NNNNN@vN → 원본 파일 F-NNNN 추적",
+        "CALC-NNNN 계산의 경우 원천 데이터 명시",
+        "증거 연속성 (provenance chain) 단절 감지 시 보고"
+      ],
+      "prohibitions": [
+        "중간 가공 파일을 원본으로 위장 금지",
+        "증거 체인 없이 final draft 승인 금지"
+      ]
+    }
+  }
+}

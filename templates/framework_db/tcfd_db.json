@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "framework_name": "TCFD",
+  "framework_name_full": "Task Force on Climate-related Financial Disclosures",
+  "version": "2023",
+  "last_updated": "2024-01-15",
+  "source_url": "https://www.fsb-tcfd.org/",
+  "description": "기후 관련 재무 공시 태스크포스 프레임워크",
+  "disclosures": [
+    {
+      "disclosure_id": "G1",
+      "pillar": "Governance",
+      "pillar_ko": "지배구조",
+      "recommendation_ko": "기후 관련 위험 및 기회에 대한 조직의 감독에 대해 공시",
+      "recommendation_en": "Disclose the organization's governance around climate-related risks and opportunities",
+      "recommended_metrics": [
+        "이사회 기후 관련 감독 빈도",
+        "경영진 기후 관련 역할 및 책임",
+        " 기후 관련 위험 평가 절차"
+      ],
+      "source_url": "https://www.fsb-tcfd.org/recommendations/"
+    },
+    {
+      "disclosure_id": "G2",
+      "pillar": "Strategy",
+      "pillar_ko": "전략",
+      "recommendation_ko": "기후 관련 위험 및 기회가 사업모델, 전략, 재무계획에 미치는 실질적 영향을 공시",
+      "recommendation_en": "Disclose the actual and potential impacts of climate-related risks and opportunities on the organization's business model, strategy, and financial planning",
+      "recommended_metrics": [
+        "단기/중기/장기 기후 관련 위험 및 기회",
+        "기후 관련 위험이 회사 업무에 미치는 영향",
+        "전략 적응 조치"
+      ],
+      "source_url": "https://www.fsb-tcfd.org/recommendations/"
+    },
+    {
+      "disclosure_id": "G3",
+      "pillar": "Risk Management",
+      "pillar_ko": "위험 관리",
+      "recommendation_ko": "기후 관련 위험을 식별, 평가, 관리하는 프로세스를 공시",
+      "recommendation_en": "Disclose how the organization identifies, assesses, and manages climate-related risks",
+      "recommended_metrics": [
+        "기후 관련 위험 식별 프로세스",
+        "기후 관련 위험 평가 방법론",
+        "기후 관련 위험 관리 프로세스",
+        "기후 관련 위험 완화 조치"
+      ],
+      "source_url": "https://www.fsb-tcfd.org/recommendations/"
+    },
+    {
+      "disclosure_id": "G4",
+      "pillar": "Metrics and Targets",
+      "pillar_ko": "지표 및 목표",
+      "recommendation_ko": "기후 관련 위험 및 기회를 평가하고 관리하는 데 사용하는 지표를 공시",
+      "recommendation_en": "Disclose the metrics and targets used to assess and manage relevant climate-related risks and opportunities",
+      "recommended_metrics": [
+        "Scope 1 온실가스 배출량",
+        "Scope 2 온실가스 배출량",
+        "Scope 3 온실가스 배출량",
+        "기후 관련 목표 및 진척 상황",
+        "자본비용 할당",
+        "기후 관련 보상 체계"
+      ],
+      "source_url": "https://www.fsb-tcfd.org/recommendations/"
+    }
+  ],
+  "cross_cutting_requirements": {
+    "scenario_analysis": "기후 관련 위험 평가를 위한 시나리오 분석 수행 및 공시 권고",
+    "time_horizons": ["단기 (1-3년)", "중기 (3-10년)", "장기 (10+년)"],
+    "transition_physical_risks": "전환 위험과 물리적 위험 구분 공시"
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": "1.0",
+  "framework_name": "SASB (Sustainability Accounting Standards Board)",
+  "version": "2024",
+  "last_updated": "2024-01-01",
+  "source_url": "https://sasb.org/standards/",
+  "description": "SASB Industry-specific sustainability accounting standards",
+  "industries": [
+    {
+      "industry_code": "RT-CH",
+      "industry_name": "Resource Transformation - Chemicals",
+      "topics": [
+        {
+          "topic_code": "RT-CH-110",
+          "topic_name": "Greenhouse Gas Emissions",
+          "metric_name": "Gross global Scope 1 emissions",
+          "unit": "metric tons CO2-eq",
+          "accounting_leads": [
+            "Track absolute gross Scope 1 emissions",
+            "Report methodology (GHG Protocol)",
+            "Exclude biogenic carbon"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-110.1",
+          "topic_name": "Greenhouse Gas Emissions",
+          "metric_name": "Gross global Scope 2 emissions",
+          "unit": "metric tons CO2-eq",
+          "accounting_leads": [
+            "Track absolute gross Scope 2 emissions",
+            "Location-based and market-based reporting"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-110.2",
+          "topic_name": "Greenhouse Gas Emissions",
+          "metric_name": "Total Scope 1 and Scope 2 emissions intensity",
+          "unit": "metric tons CO2-eq per revenue",
+          "accounting_leads": [
+            "Normalize by revenue unit",
+            "Report intensity ratio methodology"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-130",
+          "topic_name": "Energy Management",
+          "metric_name": "Total energy consumed",
+          "unit": "GJ",
+          "accounting_leads": [
+            "Total energy from all sources",
+            "Percentage from renewable sources",
+            "Report energy intensity ratio"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-130.1",
+          "topic_name": "Energy Management",
+          "metric_name": "Percentage grid electricity",
+          "unit": "%",
+          "accounting_leads": [
+            "Report percentage from grid electricity",
+            "Percentage from renewable sources"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-140",
+          "topic_name": "Water Management",
+          "metric_name": "Total water withdrawn",
+          "unit": "thousand cubic meters",
+          "accounting_leads": [
+            "Breakdown by source (municipal, groundwater, surface water)",
+            "Water stress regions disclosure"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-140.1",
+          "topic_name": "Water Management",
+          "metric_name": "Total water consumed",
+          "unit": "thousand cubic meters",
+          "accounting_leads": [
+            "Net water consumption after discharge",
+            "Percentage in water-stressed regions"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-150",
+          "topic_name": "Waste Management",
+          "metric_name": "Total hazardous waste generated",
+          "unit": "metric tons",
+          "accounting_leads": [
+            "Hazardous waste generated",
+            "Percentage diverted from disposal",
+            "Recovery and treatment methods"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-150.1",
+          "topic_name": "Waste Management",
+          "metric_name": "Hazardous waste diverted from disposal",
+          "unit": "metric tons",
+          "accounting_leads": [
+            "Percentage recycled",
+            "Energy recovery percentage",
+            "Treatment methods"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-150.2",
+          "topic_name": "Waste Management",
+          "metric_name": "Hazardous waste directed to disposal",
+          "unit": "metric tons",
+          "accounting_leads": [
+            "Incineration with/without energy recovery",
+            "Landfill percentage",
+            "Other disposal methods"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-410",
+          "topic_name": "Supply Chain Management",
+          "metric_name": "Percentage of Tier 1 suppliers audited",
+          "unit": "%",
+          "accounting_leads": [
+            "Report audit coverage rate",
+            "Environmental and social criteria"
+          ]
+        },
+        {
+          "topic_code": "RT-CH-410.1",
+          "topic_name": "Supply Chain Management",
+          "metric_name": "Percentage of Tier 1 suppliers meeting standards",
+          "unit": "%",
+          "accounting_leads": [
+            "Environmental performance criteria",
+            "Labor and human rights criteria",
+            "Corrective action follow-up"
+          ]
+        }
+      ]
+    },
+    {
+      "industry_code": "LV-CO",
+      "industry_name": "Lifestyle - Consumer Goods",
+      "topics": [
+        {
+          "topic_code": "LV-CO-410a",
+          "topic_name": "Supply Chain Management",
+          "metric_name": "Percentage of suppliers audited for labor practices",
+          "unit": "%",
+          "accounting_leads": [
+            "First-tier suppliers audited",
+            "Audit frequency and coverage",
+            "Labor law compliance verification"
+          ]
+        },
+        {
+          "topic_code": "LV-CO-410b",
+          "topic_name": "Supply Chain Management",
+          "metric_name": "Percentage of suppliers meeting sourcing standards",
+          "unit": "%",
+          "accounting_leads": [
+            "Environmental sourcing criteria",
+            "Social compliance standards",
+            "Continuous improvement targets"
+          ]
+        },
+        {
+          "topic_code": "LV-CO-420a",
+          "topic_name": "Materials Sourcing",
+          "metric_name": "Raw materials traceability",
+          "unit": "%",
+          "accounting_leads": [
+            "Percentage of raw materials from certified sources",
+            "Conflict minerals disclosure",
+            "Deforestation-free sourcing"
+          ]
+        },
+        {
+          "topic_code": "LV-CO-430a",
+          "topic_name": "Environmental Impacts in Operations",
+          "metric_name": "Energy intensity per unit produced",
+          "unit": "GJ per unit",
+          "accounting_leads": [
+            "Track manufacturing energy use",
+            "Report intensity metrics",
+            "Renewable energy percentage"
+          ]
+        },
+        {
+          "topic_code": "LV-CO-430b",
+          "topic_name": "Environmental Impacts in Operations",
+          "metric_name": "Water withdrawal intensity",
+          "unit": "cubic meters per unit",
+          "accounting_leads": [
+            "Water-stressed region assessment",
+            "Conservation initiatives"
+          ]
+        }
+      ]
+    }
+  ]
+}

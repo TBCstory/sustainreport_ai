@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "data_gap_report.schema.json",
+  "title": "Data Gap Report",
+  "type": "object",
+  "required": ["generated_at", "workspace_id", "sections", "summary"],
+  "properties": {
+    "generated_at": { "type": "string", "format": "date-time" },
+    "workspace_id": { "type": "string" },
+    "overall_readiness": { "type": "string", "enum": ["low", "medium", "high"] },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "data_readiness", "readiness_score", "missing_data_types"],
+        "properties": {
+          "section_id": { "type": "string" },
+          "section_title": { "type": "string" },
+          "data_readiness": { "type": "string", "enum": ["low", "medium", "high"] },
+          "readiness_score": { "type": "number", "minimum": 0, "maximum": 1 },
+          "available_segments": { "type": "array", "items": { "type": "string" } },
+          "available_segment_types": { "type": "array", "items": { "type": "string" } },
+          "missing_data_types": { "type": "array", "items": { "type": "string" } },
+          "missing_data_likely_source": { "type": "string" },
+          "recommended_action": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_sections": { "type": "integer" },
+        "high_readiness": { "type": "integer" },
+        "medium_readiness": { "type": "integer" },
+        "low_readiness": { "type": "integer" },
+        "critical_missing": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

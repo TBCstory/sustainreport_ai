@@ -1,0 +1,108 @@
+{
+  "plan_id": "SYSIMPROVE-2026-003",
+  "title": "실행 진실성 확보 + 컨설턴트 결과물 품질 정합 — 파이프라인 dispatch·필드 계약 통일·workspace doctor",
+  "created_at": "2026-04-06T12:00:00Z",
+  "created_by": "orchestrator",
+  "motivation": "SYSIMPROVE-2026-002에서 phase/gate 정의, normalize 통합, toc_draft 생성, 테스트 123개 통과까지 완료. 그러나 (1) run_pipeline.py dispatch가 P0.5/P1.5를 실제 실행하지 않고 건너뜀, (2) draft meta 필드명이 스키마·런타임·실제 산출물 간 3원 불일치, (3) run_handoff.py가 잘못된 필드를 읽어 (제목 없음)/증거 0개 출력, (4) run_toc_planner.py가 intake 스키마와 다른 키를 참조. 이번 플랜은 '실행의 진실성'과 '컨설턴트가 받는 결과물의 품질'을 확보하는 것이 목표.",
+  "predecessor_plan": "SYSIMPROVE-2026-002",
+  "plan_status": "completed",
+  "total_packets": 6,
+  "current_packet": null,
+  "packets": [
+    {
+      "packet_id": "PKT-B001",
+      "name": "run_pipeline.py dispatch 정합성 — P0.5/P1.5 실행 경로 연결",
+      "status": "done",
+      "completed_at": "2026-04-06T12:30:00Z",
+      "summary": "phase 필터 인덱스 기반 교체, dispatch에 P0.5/P1.5 elif 추가, _run_phase_p0_5는 intake_manifest 부재 시 success=False, _run_phase_p1_5는 toc_draft 부재 시 run_toc_draft() 호출. pytest 123개 전체 통과.",
+      "spec_file": "PKT-B001_pipeline_dispatch_fix.md",
+      "depends_on": [],
+      "estimated_effort": "medium",
+      "priority": 1,
+      "description": "run_pipeline.py의 (1) 문자열 비교 phase 필터를 인덱스 기반으로 교체, (2) dispatch 분기에 P0.5/P1.5 elif 추가, (3) _run_phase_p0_5/_run_phase_p1_5에 실제 엔트리포인트 호출 또는 명시적 block 로직 추가"
+    },
+    {
+      "packet_id": "PKT-B002",
+      "name": "draft_meta 필드 계약 통일 — 스키마·section-writer·run_handoff 3원 정합",
+      "status": "done",
+      "completed_at": "2026-04-06T13:00:00Z",
+      "summary": "draft_meta.schema.json 재정의 (heading_ko, draft_confidence, evidence_segments, placeholders, missing_evidence 정규화), writing_blueprint.schema.json title→heading_ko, section-writer.md 메타 예시 갱신, migrate_draft_meta.py 신규 생성. pytest 123개 통과.",
+      "spec_file": "PKT-B002_draft_meta_contract_unify.md",
+      "depends_on": [],
+      "estimated_effort": "large",
+      "priority": 1,
+      "description": "draft_meta.schema.json을 실제 필요 기준으로 재정의하고, section-writer 에이전트 프롬프트·run_handoff.py·run_section_writer.py가 동일한 필드명을 사용하도록 통일. 기존 산출물 마이그레이션 스크립트 포함"
+    },
+    {
+      "packet_id": "PKT-B003",
+      "name": "run_toc_planner intake 계약 정합 — custom_toc_reference/section_priority",
+      "status": "done",
+      "completed_at": "2026-04-06T14:00:00Z",
+      "summary": "run_toc_planner.py _build_toc_draft_prompt에서 custom_toc_reference/section_priority 정규 키 사용 (alias fallback 포함). 테스트 2개 추가. pytest 125개 전체 통과.",
+      "spec_file": "PKT-B003_toc_intake_alignment.md",
+      "depends_on": [],
+      "estimated_effort": "small",
+      "priority": 2,
+      "description": "run_toc_planner.py에서 preferred_toc_reference→custom_toc_reference, priority_sections→section_priority로 키 이름 수정. 1릴리스 alias 허용. 테스트에서 fixture 반영 검증"
+    },
+    {
+      "packet_id": "PKT-B004",
+      "name": "run_handoff.py 산출물 품질 수정 — 실제 필드 기반 집계",
+      "status": "done",
+      "completed_at": "2026-04-06T15:00:00Z",
+      "summary": "run_handoff.py 3개 함수(_generate_placeholder_summary, _generate_data_gap_priority, _generate_consultant_review_checklist)를 정규 필드명(heading_ko, draft_confidence 등) + alias fallback 사용하도록 수정. _calc_review_priority, _read_meta_field, _normalize_confidence, _extract_placeholder_strings helper 추가. review_priority_score 기반 정렬. consultant_review_checklist에 data_collection_needed/heavy_placeholder_section 항목 추가. pytest 125개 전체 통과.",
+      "spec_file": "PKT-B004_handoff_quality_fix.md",
+      "depends_on": ["PKT-B002"],
+      "estimated_effort": "medium",
+      "priority": 2,
+      "description": "PKT-B002에서 통일된 필드 계약 기준으로 run_handoff.py의 3개 함수(placeholder_summary, data_gap_priority, consultant_review_checklist) 재작성. heading_ko/draft_confidence 등 실제 키 사용. review_priority_score 추가"
+    },
+    {
+      "packet_id": "PKT-B005",
+      "name": "E2E 런타임 회귀 테스트 — dispatch·handoff·toc intake 실행 검증",
+      "status": "done",
+      "completed_at": "2026-04-06T16:00:00Z",
+      "summary": "test_run_pipeline_dispatch.py(5 tests) + test_run_handoff_quality.py(6 tests) 신규 생성. test_run_toc_planner.py에 intake 키 테스트 2개 기존 등록. build_draft_package confidence 정규화 버그 수정. pytest 136개 전체 통과."
+      "spec_file": "PKT-B005_e2e_runtime_tests.md",
+      "depends_on": ["PKT-B001", "PKT-B002", "PKT-B003", "PKT-B004"],
+      "estimated_effort": "medium",
+      "priority": 3,
+      "description": "run_pipeline P0.5/P1.5 단독 실행 테스트, run_handoff semantic assertion (제목·confidence·evidence 실값 확인), toc_draft intake 반영 테스트 추가"
+    },
+    {
+      "packet_id": "PKT-B006",
+      "name": "workspace doctor — 파생 상태 파일 lint + 자동 재생성",
+      "status": "done",
+      "completed_at": "2026-04-06T02:10:00Z",
+      "summary": "scripts/workspace_doctor.py 신규 생성 (5개 검사: PHASE_CONSISTENCY, GATE_CONSISTENCY, NEXT_ACTIONS_STALE, OPEN_QUERIES, META_FIELD_CHECK). --check/--fix/--json CLI modes 구현. test_workspace_doctor.py 21개 테스트 신규 생성. pytest 157개 전체 통과."
+      "spec_file": "PKT-B006_workspace_doctor.md",
+      "depends_on": [],
+      "estimated_effort": "medium",
+      "priority": 3,
+      "description": "scripts/workspace_doctor.py 신규 생성. project_state.json, next_actions.json, draft_queries.json, approval_gates.json의 stale/mismatch 자동 감지. 선택적 --fix 모드로 재생성"
+    }
+  ],
+  "execution_order": [
+    "PKT-B001",
+    "PKT-B002",
+    "PKT-B003",
+    "PKT-B004",
+    "PKT-B005",
+    "PKT-B006"
+  ],
+  "key_principles": [
+    "필드명 변경 시 스키마→런타임→에이전트 프롬프트→실제 산출물 4곳을 모두 맞춘다",
+    "기존 워크스페이스 산출물의 마이그레이션 경로를 반드시 제공한다",
+    "dispatch 수정 후 반드시 실행 테스트로 silent pass가 불가능함을 검증한다",
+    "각 패킷 완료 시 uv run pytest로 전체 스위트를 돌려 회귀를 확인한다",
+    "기존 테스트(123 passed)를 깨지 않으면서 새 기능을 추가한다"
+  ],
+  "completion_criteria": {
+    "PKT-B001": "PipelineEngine(start_phase='P0.5', end_phase='P0.5')가 phases_executed=['P0.5']를 반환. P1.5 동일. --start P0 --end P7에서 P0.5/P1.5가 포함된 phases_executed 확인.",
+    "PKT-B002": "draft_meta.schema.json의 필드명과 실제 SEC-*_meta.json 필드명이 일치. 기존 산출물이 마이그레이션 스크립트 통과.",
+    "PKT-B003": "run_toc_planner.py가 intake_manifest의 custom_toc_reference, section_priority를 읽어 LLM 프롬프트에 반영됨을 테스트로 검증.",
+    "PKT-B004": "샘플 워크스페이스에서 run_handoff.py 실행 시 (제목 없음) 사라짐, confidence 실값 출력, evidence count > 0, checklist에 항목 존재.",
+    "PKT-B005": "새 테스트 파일 3개 이상 추가. 전체 pytest 통과.",
+    "PKT-B006": "workspace_doctor.py --check가 정상 워크스페이스에서 0 warnings, 의도적 불일치 워크스페이스에서 경고 출력."
+  }
+}

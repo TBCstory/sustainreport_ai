@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intake_manifest.schema.json",
+  "title": "Intake Manifest",
+  "description": "인테이크 인터뷰 결과 — 보고서 작성 의사결정 사항",
+  "type": "object",
+  "required": ["manifest_id", "project_id", "interviewed_at", "A_structure", "B_style"],
+  "properties": {
+    "manifest_id": { "type": "string", "pattern": "^INTAKE-PRJ-" },
+    "project_id": { "type": "string", "pattern": "^PRJ-" },
+    "interviewed_at": { "type": "string", "format": "date-time" },
+    "agent": { "type": "string" },
+    "A_structure": {
+      "type": "object",
+      "required": ["toc_style", "scope_inclusions", "scope_exclusions"],
+      "properties": {
+        "toc_style": { "type": "string", "enum": ["framework", "theme", "custom"] },
+        "custom_toc_reference": { "type": ["string", "null"] },
+        "scope_inclusions": { "type": "array", "items": { "type": "string" } },
+        "scope_exclusions": { "type": "array", "items": { "type": "string" } },
+        "section_priority": { "type": "array", "items": { "type": "string" } },
+        "section_priority_rationale": { "type": "string" }
+      }
+    },
+    "B_style": {
+      "type": "object",
+      "required": ["narrative_style", "sentence_ending"],
+      "properties": {
+        "narrative_style": { "type": "string", "enum": ["framework", "activity", "mixed"] },
+        "mixed_section_map": { "type": "object" },
+        "sentence_ending": { "type": "string" },
+        "company_name_rule": { "type": "string" },
+        "english_parallel": { "type": "boolean" }
+      }
+    },
+    "C_references": {
+      "type": "object",
+      "properties": {
+        "previous_report_path": { "type": ["string", "null"] },
+        "benchmark_report_paths": { "type": "array" },
+        "materiality_assessment_available": { "type": "boolean" },
+        "high_materiality_topics": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "D_data": {
+      "type": "object",
+      "properties": {
+        "quantitative_data_status": { "type": "string", "enum": ["none", "partial", "most"] },
+        "confirmed_data_files": { "type": "array" },
+        "must_include_achievements": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "open_notes": { "type": "string" }
+  }
+}

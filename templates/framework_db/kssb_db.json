@@ -1,0 +1,207 @@
+{
+  "_meta": {
+    "schema_version": "1.0",
+    "framework_name": "KSSB",
+    "framework_name_full_ko": "한국지속가능성보고서서식",
+    "framework_name_full_en": "Korea Sustainability Reporting Standards",
+    "version": "2022",
+    "last_updated": "2024-01-15",
+    "source_url": "https://www.sasb.org/kr/standards/kr-disclosure-topics/"
+  },
+  "framework": [
+    {
+      "section_id": "KSSB-E1",
+      "area": "환경",
+      "topic_ko": "기후변화",
+      "topic_en": "Climate Change",
+      "disclosure_requirements": [
+        "온실가스 배출량 (Scope 1, 2, 3)",
+        "기후변화 대응 전략 및 목표",
+        "재생에너지 비율",
+        "탄소 배출 감축 실적"
+      ],
+      "related_gri": ["GRI 302", "GRI 305"]
+    },
+    {
+      "section_id": "KSSB-E2",
+      "area": "환경",
+      "topic_ko": "에너지",
+      "topic_en": "Energy",
+      "disclosure_requirements": [
+        "총 에너지 소비량",
+        "에너지 강도",
+        "재생에너지 사용량 및 비율",
+        "에너지 효율화 개선 실적"
+      ],
+      "related_gri": ["GRI 302"]
+    },
+    {
+      "section_id": "KSSB-E3",
+      "area": "환경",
+      "topic_ko": "물",
+      "topic_en": "Water",
+      "disclosure_requirements": [
+        "총 용수 사용량",
+        "물 스트레스 지역 취수량",
+        "재이용수량",
+        "배출량 및 수질 관리"
+      ],
+      "related_gri": ["GRI 303"]
+    },
+    {
+      "section_id": "KSSB-E4",
+      "area": "환경",
+      "topic_ko": "폐기물",
+      "topic_en": "Waste",
+      "disclosure_requirements": [
+        "총 폐기물 발생량",
+        "폐기물 회수율",
+        "유해 폐기물 관리",
+        "순환 자원 이용률"
+      ],
+      "related_gri": ["GRI 306"]
+    },
+    {
+      "section_id": "KSSB-E5",
+      "area": "환경",
+      "topic_ko": "생물다양성",
+      "topic_en": "Biodiversity",
+      "disclosure_requirements": [
+        "운영 또는 공급망의 생물다양성 영향",
+        "보전 활동 및 목표",
+        "자연생태계 보호 구역 면적",
+        "종 보호 현황"
+      ],
+      "related_gri": ["GRI 304"]
+    },
+    {
+      "section_id": "KSSB-S1",
+      "area": "사회",
+      "topic_ko": "고용",
+      "topic_en": "Employment",
+      "disclosure_requirements": [
+        "총 직원 수 및 구성",
+        "직원 이탈률",
+        "급여 및 복리후생",
+        "노동조합 가입률",
+        "성과평가 및 경력개발"
+      ],
+      "related_gri": ["GRI 401", "GRI 404", "GRI 405"]
+    },
+    {
+      "section_id": "KSSB-S2",
+      "area": "사회",
+      "topic_ko": "안전보건",
+      "topic_en": "Health and Safety",
+      "disclosure_requirements": [
+        "근로재해율 (LTIR, TRIR)",
+        "직업성 질병 발생률",
+        "안전보건 경영시스템 인증",
+        "안전교육 실시 현황",
+        "산업위해물질 노출 관리"
+      ],
+      "related_gri": ["GRI 403"]
+    },
+    {
+      "section_id": "KSSB-S3",
+      "area": "사회",
+      "topic_ko": "인권",
+      "topic_en": "Human Rights",
+      "disclosure_requirements": [
+        "인권 Due Diligence",
+        "차별 금지 및 동일금여",
+        "강제노동 및 아동노동 금지",
+        "안전 및 자유로운 직장환경"
+      ],
+      "related_gri": [
+        "GRI 406",
+        "GRI 407",
+        "GRI 408",
+        "GRI 409",
+        "GRI 410",
+        "GRI 411",
+        "GRI 412",
+        "GRI 413"
+      ]
+    },
+    {
+      "section_id": "KSSB-S4",
+      "area": "사회",
+      "topic_ko": "사회공헌",
+      "topic_en": "Community Engagement",
+      "disclosure_requirements": [
+        "사회공헌 지출 규모",
+        "지역사회 파트너십 프로그램",
+        "사회적 가치 창출 활동",
+        "사회투자 효과 측정"
+      ],
+      "related_gri": ["GRI 413"]
+    },
+    {
+      "section_id": "KSSB-G1",
+      "area": "지배구조",
+      "topic_ko": "지배구조",
+      "topic_en": "Corporate Governance",
+      "disclosure_requirements": [
+        "이사회 구성 및 다양성",
+        "이사회 효율성 평가",
+        "지배구조 체계",
+        "위원회 구성 및 운영",
+        "지배구조 개선 노력"
+      ],
+      "related_gri": [
+        "GRI 2-9",
+        "GRI 2-10",
+        "GRI 2-11",
+        "GRI 2-12",
+        "GRI 2-13",
+        "GRI 2-14",
+        "GRI 2-15",
+        "GRI 2-16",
+        "GRI 2-17",
+        "GRI 2-18",
+        "GRI 2-19",
+        "GRI 2-20",
+        "GRI 2-21",
+        "GRI 2-22",
+        "GRI 2-23"
+      ]
+    },
+    {
+      "section_id": "KSSB-G2",
+      "area": "지배구조",
+      "topic_ko": "윤리",
+      "topic_en": "Ethics",
+      "disclosure_requirements": [
+        "윤리경영방침",
+        "행동강령 공포 및 교육",
+        "윤리 위반 신고 채널",
+        "윤리 관련 징계 실적",
+        "부패방지 프로그램"
+      ],
+      "related_gri": ["GRI 205", "GRI 206"]
+    },
+    {
+      "section_id": "KSSB-G3",
+      "area": "지배구조",
+      "topic_ko": "투명성",
+      "topic_en": "Transparency",
+      "disclosure_requirements": [
+        "정보공시 정책",
+        "세금 전략",
+        "정치적 기여",
+        "이해관계자 참여",
+        "공정거래 및 경쟁 정책"
+      ],
+      "related_gri": [
+        "GRI 2-24",
+        "GRI 2-25",
+        "GRI 2-26",
+        "GRI 2-27",
+        "GRI 2-28",
+        "GRI 2-29",
+        "GRI 2-30"
+      ]
+    }
+  ]
+}

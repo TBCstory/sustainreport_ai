@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "model_routing.json",
+  "title": "Model Routing Policy",
+  "description": "에이전트 역할별 모델 라우팅 정책 정의. litellm 기반 멀티모델 통합.",
+  "version": "1.0.0",
+  "poc_mode": {
+    "enabled": false,
+    "default_provider": "anthropic",
+    "default_model": "claude-sonnet-4-20250514",
+    "fallback_model": "claude-haiku-4-20250514",
+    "note": "운영 모드 전환. 에이전트별 차등 모델 적용. agent_model_policy 참조."
+  },
+  "agent_model_policy": {
+    "data-analyst": {
+      "primary_model": "claude-haiku-4-20250514",
+      "fallback": "claude-haiku-4-20250514",
+      "max_tokens": 8192,
+      "temperature": 0.3,
+      "use_case": "파일 정규화, 세그먼트 추출 - 결정론적 작업, Haiku로 충분",
+      "cost_tier": "low",
+      "rationale": "현재 LLM 의존도 낮음. 대부분 scripts/run_ingestion.py의 결정론적 처리."
+    },
+    "toc-planner": {
+      "primary_model": "claude-sonnet-4-20250514",
+      "fallback": "claude-haiku-4-20250514",
+      "max_tokens": 16384,
+      "temperature": 0.4,
+      "use_case": "목차 설계, 구조 기획 - 전체 보고서 구조 결정, Sonnet 유지",
+      "cost_tier": "high",
+      "rationale": "writing_blueprint 품질이 P3-P7 전체를 결정. 비용 절약 대상 아님."
+    },
+    "framework-mapper": {
+      "primary_model": "claude-haiku-4-20250514",
+      "fallback": "claude-haiku-4-20250514",
+      "max_tokens": 8192,
+      "temperature": 0.3,
+      "use_case": "프레임워크 매핑 - 결정론적 버킷 구축, Haiku로 충분",
+      "cost_tier": "low",
+      "rationale": "_build_buckets_from_structure_index()가 결정론적. LLM은 enrichment 보조에만 사용."
+    },
+    "section-writer": {
+      "primary_model": "claude-sonnet-4-20250514",
+      "fallback": "claude-haiku-4-20250514",
+      "max_tokens": 16384,
+      "temperature": 0.5,
+      "use_case": "초안 작성 - 한국어 ESG 문체·어미 일관성 필수, Sonnet 유지",
+      "cost_tier": "high",
+      "rationale": "한국어 ESG 전문 용어, 문체, provenance tag 삽입 품질이 핵심. 비용 절약 대상 아님.",
+      "special_instructions": [
+        "writing_blueprint의 model_recommendation 우선 적용",
+        "depth_level 4(종합) 섹션은 토큰 제한 상향 가능"
+      ]
+    },
+    "internal-reviewer": {
+      "primary_model": "claude-sonnet-4-20250514",
+      "fallback": "claude-haiku-4-20250514",
+      "max_tokens": 8192,
+      "temperature": 0.2,
+      "use_case": "내부 검수 - 수치 일치·모순 탐지 정확도 필수, Sonnet 유지",
+      "cost_tier": "high",
+      "rationale": "검수 정확도가 초안 신뢰성을 결정. 비용 절약 대상 아님."
+    },
+    "fact-checker": {
+      "primary_model": "claude-haiku-4-20250514",
+      "fallback": "claude-haiku-4-20250514",
+      "max_tokens": 8192,
+      "temperature": 0.1,
+      "use_case": "외부 검증 - 현재 stub 수준, Haiku로 충분",
+      "cost_tier": "low",
+      "rationale": "현재 실질 LLM 기능 없음(stub). 추후 외부 API 연동 시 재검토."
+    },
+    "provenance-builder": {
+      "primary_model": "claude-haiku-4-20250514",
+      "fallback": "claude-haiku-4-20250514",
+      "max_tokens": 8192,
+      "temperature": 0.2,
+      "use_case": "증거 체인 구축 - 구조적 조립 작업, Haiku로 충분",
+      "cost_tier": "low",
+      "rationale": "evidence chain, paragraph map, KPI registry 조립은 결정론적. LLM은 보조."
+    }
+  },
+  "provider_config": {
+    "anthropic": {
+      "provider": "anthropic",
+      "models": [
+        "claude-sonnet-4-20250514",
+        "claude-haiku-4-20250514",
+        "claude-opus-4-20250514"
+      ],
+      "litellm_provider": "anthropic",
+      "env_vars": ["ANTHROPIC_API_KEY"]
+    },
+    "openai": {
+      "provider": "openai",
+      "models": ["gpt-4o", "gpt-4o-mini"],
+      "litellm_provider": "openai",
+      "env_vars": ["OPENAI_API_KEY"]
+    },
+    "google": {
+      "provider": "google",
+      "models": ["gemini-1.5-pro", "gemini-1.5-flash"],
+      "litellm_provider": "gemini",
+      "env_vars": ["GOOGLE_API_KEY"]
+    },
+    "local": {
+      "provider": "ollama",
+      "models": ["llama3", "mistral"],
+      "litellm_provider": "ollama",
+      "base_url": "http://localhost:11434",
+      "note": "개발/테스트용 로컬 모델"
+    }
+  },
+  "routing_rules": {
+    "cost_optimization": {
+      "enabled": false,
+      "note": "PoC에서는 비활성화. 운영 시 section-writer의 flex 모드에서 haiku 사용 고려"
+    },
+    "performance_priority": {
+      "enabled": true,
+      "high_complexity_threshold": {
+        "depth_level": 4,
+        "max_tokens_ratio": 0.8
+      },
+      "escalate_to": "claude-opus-4-20250514"
+    },
+    "retry_policy": {
+      "max_retries": 2,
+      "retry_on": ["rate_limit", "api_error"],
+      "fallback_chain": ["primary", "fallback", "abort"]
+    }
+  },
+  "litellm_config": {
+    "drop_params": true,
+    "set_verbose": false,
+    "request_timeout": 120,
+    "max_parallel_requests": 10
+  }
+}

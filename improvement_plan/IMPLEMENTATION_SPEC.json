@@ -1,0 +1,80 @@
+{
+  "plan_id": "SYSIMPROVE-2026-001",
+  "title": "sustainreport_ai 시스템 개선 — 컨설턴트 소통 및 결과물 품질 강화",
+  "created_at": "2026-04-05T00:00:00Z",
+  "created_by": "orchestrator",
+  "motivation": "PRJ-2026-KRS-001 레트로스펙티브: 사전 소통 부재, 파일 처리 한계 미고지, 목차 논의 누락, 활동 사례 자료 미구분으로 인한 결과물 품질 갭 식별",
+  "plan_status": "completed",
+  "completed_at": "2026-04-06T02:00:00Z",
+  "total_packets": 6,
+  "current_packet": "PKT-006",
+  "packets": [
+    {
+      "packet_id": "PKT-001",
+      "name": "인테이크 인터뷰어 에이전트 신설",
+      "status": "done",
+      "completed_at": "2026-04-05T13:10:43Z",
+      "summary": "intake-interviewer.md + intake_manifest.schema.json 생성, toc-planner.md 역할 섹션에 intake_manifest 선행 조건 추가",
+      "spec_file": "PKT-001_intake_interviewer.md",
+      "depends_on": [],
+      "estimated_effort": "medium"
+    },
+    {
+      "packet_id": "PKT-002",
+      "name": "data-analyst 갭 리포트 + 파일 한계 고지 강화",
+      "status": "done",
+      "completed_at": "2026-04-06T00:15:00Z",
+      "summary": "data-analyst.md에 0단계(처리 불가 파일 사전 체크) + 5단계(데이터 갭 리포트) 추가, data_gap_report.schema.json + gap_report_script_spec.md 생성",
+      "spec_file": "PKT-002_data_analyst_enhancement.md",
+      "depends_on": ["PKT-001"],
+      "estimated_effort": "medium"
+    },
+    {
+      "packet_id": "PKT-003",
+      "name": "toc-planner 목차 논의 단계 추가",
+      "status": "done",
+      "completed_at": "2026-04-05T13:35:14Z",
+      "summary": "toc-planner.md에 0~2단계(사전입력확인/목차초안생성/컨설턴트승인) 추가, toc_draft.json 출력계약 신규, 기존 로직 3~5단계로 재명명, agent_contracts.json 업데이트",
+      "spec_file": "PKT-003_toc_planner_enhancement.md",
+      "depends_on": ["PKT-001"],
+      "estimated_effort": "medium"
+    },
+    {
+      "packet_id": "PKT-004",
+      "name": "section-writer 사례 부재 경고 + 자료 유형 구분 처리",
+      "status": "done",
+      "completed_at": "2026-04-06T01:00:00Z",
+      "summary": "section-writer.md에 0단계 사전 체크, 자료 유형 분류, 활동 사례 부재 경고, intake_manifest 스타일 적용, 자료 유형별 서술 패턴 추가",
+      "spec_file": "PKT-004_section_writer_enhancement.md",
+      "depends_on": ["PKT-002"],
+      "estimated_effort": "medium"
+    },
+    {
+      "packet_id": "PKT-005",
+      "name": "오케스트레이터 흐름 및 phase_rules 업데이트",
+      "status": "done",
+      "completed_at": "2026-04-05T14:03:17Z",
+      "summary": "phase_rules.json에 P0.5/P1.5 추가, gate_rules.json에 GATE-P05-TO-P1/GATE-P15-TO-P2 추가, CLAUDE.md 워크플로우 및 에이전트 일람 업데이트",
+      "spec_file": "PKT-005_orchestrator_flow_update.md",
+      "depends_on": ["PKT-001", "PKT-002", "PKT-003", "PKT-004"],
+      "estimated_effort": "large"
+    },
+    {
+      "packet_id": "PKT-006",
+      "name": "통합 검증 및 문서화",
+      "status": "done",
+      "completed_at": "2026-04-06T02:00:00Z",
+      "summary": "VALIDATION_REPORT.md + QUICK_START_GUIDE.md 생성, 모든 검증 항목 통과 (11/11 파일 존재, 6/6 일관성, 7/7 레트로스펙티브)",
+      "spec_file": "PKT-006_integration_validation.md",
+      "depends_on": ["PKT-005"],
+      "estimated_effort": "small"
+    }
+  ],
+  "key_principles": [
+    "컨설턴트와 사전 소통을 통해 목차·서술방식·포함범위를 먼저 결정한다",
+    "파일 처리 불가 항목은 즉시 고지하고 영향 섹션을 명시한다",
+    "활동 사례 자료와 정책 문서를 구분하여 다르게 처리한다",
+    "정량 데이터 공백은 [추후 기재]로 유지하되, 공백의 범위와 영향을 가시화한다",
+    "기존 agent 계약(입출력 명세)과 역방향 호환성을 유지한다"
+  ]
+}
