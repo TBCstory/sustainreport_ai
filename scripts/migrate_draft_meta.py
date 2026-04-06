@@ -69,20 +69,18 @@ def normalize_field_names(data: dict) -> tuple[dict, list[str]]:
     changes: list[str] = []
     normalized = dict(data)
 
-    # 1. confidence 문자열 → 숫자 변환 (confidence → draft_confidence 과정에서 처리)
-    if "_confidence_string" in normalized:
-        raw = normalized.pop("_confidence_string")  # confidence 필드에서 온 값
-        numeric = CONFIDENCE_STRING_MAP.get(raw, 0.5)
-        normalized["draft_confidence"] = numeric
-        changes.append(f"  confidence '{raw}' → draft_confidence {numeric}")
-
-    # 2. 그 외 별칭 필드 처리
+    # 1. 별칭 필드 처리
     for old_key, new_key in FIELD_ALIASES.items():
-        if old_key == "_confidence_string":
-            continue  # 이미 처리됨
         if old_key in normalized and new_key not in normalized:
             normalized[new_key] = normalized.pop(old_key)
             changes.append(f"  {old_key} → {new_key}")
+
+    # 2. confidence 문자열 → 숫자 변환
+    if "_confidence_string" in normalized:
+        raw = normalized.pop("_confidence_string")
+        numeric = CONFIDENCE_STRING_MAP.get(raw, 0.5)
+        normalized["draft_confidence"] = numeric
+        changes.append(f"  confidence '{raw}' → draft_confidence {numeric}")
 
     # 3. placeholders가 객체 배열인 경우 → 문자열 배열로 변환
     if "placeholders" in normalized:

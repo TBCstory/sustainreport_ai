@@ -78,6 +78,41 @@ def _extract_placeholder_strings(placeholders) -> list[str]:
     return []
 
 
+def _load_blueprint_heading_map(workspace: Path) -> dict[str, str]:
+    """writing_blueprint.json에서 section_id -> 제목 매핑을 읽는다."""
+    blueprint_path = workspace / "05_planning" / "writing_blueprint.json"
+    if not blueprint_path.exists():
+        return {}
+    try:
+        blueprint = json.loads(blueprint_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+    heading_map: dict[str, str] = {}
+    for sec in blueprint.get("sections", []):
+        sid = sec.get("section_id")
+        heading = sec.get("heading_ko") or sec.get("heading_text")
+        if sid and heading:
+            heading_map[sid] = heading
+    return heading_map
+
+
+def _count_bucket_segments(data: dict) -> int:
+    """버킷 파일의 세그먼트 수를 계약/alias 양쪽으로 계산."""
+    segments = data.get("evidence_segments")
+    if isinstance(segments, list):
+        return len(segments)
+    if isinstance(segments, int):
+        return segments
+
+    segments = data.get("grounded_segments", [])
+    if isinstance(segments, list):
+        return len(segments)
+    if isinstance(segments, int):
+        return segments
+    return 0
+
+
 def _calc_review_priority(meta: dict) -> float:
     """높을수록 먼저 검토 필요. 0-100 scale."""
     score = 0.0
@@ -213,7 +248,9 @@ def build_draft_package(
         confidence = _normalize_confidence(confidence_raw)
         if confidence is None:
             confidence = 0.0
-        placeholders = meta.get("placeholder_count", 0)
+        placeholders = meta.get("placeholder_count")
+        if placeholders is None:
+            placeholders = len(_extract_placeholder_strings(meta.get("placeholders") or meta.get("placeholders_inserted", [])))
         source_tag_count = meta.get("source_tag_count", 0)
 
         status = "approved" if (isinstance(confidence, (int, float)) and confidence >= 0.8) else "needs_review"
@@ -235,7 +272,9 @@ def build_draft_package(
                 "missing_evidence": meta.get("missing_evidence", [])[:3],
                 "client_confirmation_needed": meta.get("client_confirmation_needed", [])[:3],
                 "source_conflicts": meta.get("source_conflicts", [])[:3],
-                "placeholders_inserted": meta.get("placeholders_inserted", [])[:5],
+                "placeholders_inserted": _extract_placeholder_strings(
+                    meta.get("placeholders") or meta.get("placeholders_inserted", [])
+                )[:5],
                 "kpi_status_summary": meta.get("kpi_status_summary", {}),
             }
         )
@@ -645,6 +684,7 @@ def _generate_placeholder_summary(workspace: Path, outputs: list[str]) -> None:
 
     rows = []
     meta_files = sorted(drafts_dir.glob("SEC-*_meta.json"))
+    heading_map = _load_blueprint_heading_map(workspace)
 
     for meta_path in meta_files:
         try:
@@ -654,7 +694,12 @@ def _generate_placeholder_summary(workspace: Path, outputs: list[str]) -> None:
             continue
 
         section_id = meta.get("section_id", meta_path.stem.replace("_meta", ""))
-        heading = _read_meta_field(meta, "heading_ko", ["heading_text", "section_title", "title"], "(제목 없음)")
+        heading = _read_meta_field(
+            meta,
+            "heading_ko",
+            ["heading_text", "section_title", "title"],
+            heading_map.get(section_id, "(제목 없음)"),
+        )
         confidence = _normalize_confidence(
             _read_meta_field(meta, "draft_confidence", ["confidence_score", "confidence"], None)
         )
@@ -745,8 +790,7 @@ def _generate_data_gap_priority(workspace: Path, outputs: list[str]) -> None:
             try:
                 data = json.loads(bucket_file.read_text(encoding="utf-8"))
                 sid = data.get("section_id", bucket_file.stem)
-                segments = data.get("grounded_segments", [])
-                bucket_counts[sid] = len(segments)
+                bucket_counts[sid] = _count_bucket_segments(data)
             except (json.JSONDecodeError, KeyError):
                 pass
 
@@ -856,6 +900,7 @@ def _generate_consultant_review_checklist(workspace: Path, outputs: list[str]) -
     handoff_dir.mkdir(parents=True, exist_ok=True)
 
     checklist_items = []
+    heading_map = _load_blueprint_heading_map(workspace)
 
     # 1. draft_queries.json에서 미해결 질문 수집
     dq_path = workspace / "draft_queries.json"
@@ -887,7 +932,12 @@ def _generate_consultant_review_checklist(workspace: Path, outputs: list[str]) -
             score = _normalize_confidence(
                 _read_meta_field(meta, "draft_confidence", ["confidence_score", "confidence"], None)
             )
-            heading = _read_meta_field(meta, "heading_ko", ["heading_text", "section_title", "title"], "")
+            heading = _read_meta_field(
+                meta,
+                "heading_ko",
+                ["heading_text", "section_title", "title"],
+                heading_map.get(meta.get("section_id"), ""),
+            )
             if score is not None and score < 0.5:
                 checklist_items.append(
                     {

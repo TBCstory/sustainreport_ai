@@ -66,7 +66,7 @@ class TestHandoffOutputQuality:
         for sid, count in [("SEC-3", 2), ("SEC-3.1", 1), ("SEC-4", 0)]:
             bucket = {
                 "section_id": sid,
-                "grounded_segments": [{"segment_id": f"SEG-{sid}-{i}"} for i in range(count)],
+                "evidence_segments": [f"SEG-{sid}-{i}" for i in range(count)],
             }
             (ws / "06_buckets" / f"{sid}.json").write_text(json.dumps(bucket, ensure_ascii=False), encoding="utf-8")
 
@@ -286,7 +286,7 @@ class TestHandoffOutputQuality:
         # 06_buckets/SEC-OLD.json
         (ws / "06_buckets").mkdir(parents=True, exist_ok=True)
         (ws / "06_buckets" / "SEC-OLD.json").write_text(
-            json.dumps({"section_id": "SEC-OLD", "grounded_segments": [{"segment_id": "SEG-OLD-1"}]}),
+            json.dumps({"section_id": "SEC-OLD", "evidence_segments": ["SEG-OLD-1"]}),
             encoding="utf-8",
         )
 
@@ -305,3 +305,57 @@ class TestHandoffOutputQuality:
         summary = (ws / "09_handoff" / "placeholder_summary.md").read_text(encoding="utf-8")
         # heading_text가 fallback으로 읽혀서 "구旧 섹션"이 아닌 "(제목 없음)"이 아니어야 함
         assert "(제목 없음)" not in summary, "구 필드명(meta 파일)의 heading_text가 fallback으로 읽혀야 합니다"
+
+    def test_blueprint_heading_fallback_used_when_meta_title_missing(self, tmp_path: Path) -> None:
+        ws = tmp_path / "PRJ-TEST-BP"
+        (ws / "05_planning").mkdir(parents=True, exist_ok=True)
+        (ws / "05_planning" / "writing_blueprint.json").write_text(
+            json.dumps(
+                {
+                    "sections": [
+                        {
+                            "section_id": "SEC-2",
+                            "heading_ko": "고용",
+                            "evidence_priority": "high",
+                        }
+                    ],
+                    "approved": True,
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        (ws / "06_buckets").mkdir(parents=True, exist_ok=True)
+        (ws / "06_buckets" / "SEC-2.json").write_text(
+            json.dumps({"section_id": "SEC-2", "evidence_segments": ["SEG-00001"]}, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        (ws / "07_drafts").mkdir(parents=True, exist_ok=True)
+        (ws / "07_drafts" / "SEC-2_meta.json").write_text(
+            json.dumps(
+                {
+                    "section_id": "SEC-2",
+                    "draft_confidence": 0.4,
+                    "placeholders_inserted": ["[추후 기재] 고용 데이터"],
+                    "missing_evidence": ["고용 통계"],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+        (ws / "07_drafts" / "SEC-2.md").write_text("# 고용\n\n[추후 기재] 고용 데이터\n", encoding="utf-8")
+        (ws / "02_file_registry").mkdir(parents=True, exist_ok=True)
+        (ws / "02_file_registry" / "data_gap_report.json").write_text(
+            json.dumps({"unconvertible_files": []}),
+            encoding="utf-8",
+        )
+        (ws / "09_handoff").mkdir(parents=True, exist_ok=True)
+
+        run_handoff(str(ws))
+
+        summary = (ws / "09_handoff" / "placeholder_summary.md").read_text(encoding="utf-8")
+        checklist = json.loads((ws / "09_handoff" / "consultant_review_checklist.json").read_text(encoding="utf-8"))
+
+        assert "(제목 없음)" not in summary
+        assert "고용" in summary
+        assert any("고용" in item.get("description", "") for item in checklist.get("items", []))

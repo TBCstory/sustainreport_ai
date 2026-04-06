@@ -47,3 +47,31 @@ def test_orchestration_baseline_artifacts_exist_with_minimum_shape() -> None:
     assert "3개 이하" in next_action_policy
     assert "blocking_issues.json" in next_action_policy
     assert "next_actions.json" in next_action_policy
+
+
+def test_improvement_plan_specs_are_valid_json() -> None:
+    for relative_path in (
+        "improvement_plan/IMPLEMENTATION_SPEC.json",
+        "improvement_plan/IMPLEMENTATION_SPEC_002.json",
+        "improvement_plan/IMPLEMENTATION_SPEC_003.json",
+    ):
+        content = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
+        json.loads(content)
+
+
+def test_migrate_draft_meta_normalizes_legacy_confidence_string() -> None:
+    from scripts.migrate_draft_meta import normalize_field_names
+
+    normalized, _changes = normalize_field_names(
+        {
+            "section_id": "SEC-9",
+            "heading_text": "레거시 제목",
+            "confidence": "low",
+            "placeholders_inserted": ["[TBD] sample"],
+            "missing_evidence": ["source A"],
+        }
+    )
+
+    assert normalized["heading_ko"] == "레거시 제목"
+    assert normalized["draft_confidence"] == 0.25
+    assert "_confidence_string" not in normalized
