@@ -12,7 +12,7 @@ import argparse
 import json
 import shutil
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -277,7 +277,9 @@ def check_next_actions_stale(workspace: Path) -> CheckResult:
                     mtime = datetime.fromtimestamp(child.stat().st_mtime, tz=timezone.utc)
                     latest_mtime = mtime if latest_mtime is None else max(latest_mtime, mtime)
 
-    if latest_mtime is not None and latest_mtime > updated_at:
+    # Grace period: 24시간 이내 차이는 정상 운영 범위로 무시 (거짓 양성 방지)
+    grace_period = timedelta(hours=24)
+    if latest_mtime is not None and latest_mtime > (updated_at + grace_period):
         result.status = "warning"
         result.details = (
             f"next_actions.json updated at {updated_at_str}, but artifacts changed at {latest_mtime.isoformat()}"

@@ -104,6 +104,12 @@ def normalize_field_names(data: dict) -> tuple[dict, list[str]]:
         normalized["created_at"] = utc_now()
         changes.append("  created_at: 현재 시각 설정")
 
+    # 5.5. 필수 배열 필드가 없으면 빈 배열로 기본
+    for arr_field in ("evidence_segments", "placeholders", "missing_evidence"):
+        if arr_field not in normalized:
+            normalized[arr_field] = []
+            changes.append(f"  {arr_field}: 기본값 [] 설정")
+
     # 6. agent 필드가 author 대신 있는 경우 유지
     if "author" in normalized and "agent" not in normalized:
         normalized["agent"] = normalized.pop("author")
@@ -124,10 +130,41 @@ def normalize_field_names(data: dict) -> tuple[dict, list[str]]:
     return normalized, changes
 
 
+def _load_heading_map(workspace: Path) -> dict[str, str]:
+    """structure_index.json과 writing_blueprint.json에서 section_id → heading_ko 매핑 구축."""
+    heading_map: dict[str, str] = {}
+    # 1차: structure_index
+    si_path = workspace / "05_planning" / "structure_index.json"
+    if si_path.is_file():
+        try:
+            si = json.loads(si_path.read_text(encoding="utf-8"))
+            for entry in si.get("entries", []):
+                sid = entry.get("section_id", "")
+                heading = entry.get("heading_ko") or entry.get("heading_text", "")
+                if sid and heading:
+                    heading_map[sid] = heading
+        except (json.JSONDecodeError, OSError):
+            pass
+    # 2차: writing_blueprint (structure_index에 없는 것만)
+    bp_path = workspace / "05_planning" / "writing_blueprint.json"
+    if bp_path.is_file():
+        try:
+            bp = json.loads(bp_path.read_text(encoding="utf-8"))
+            for sec in bp.get("sections", []):
+                sid = sec.get("section_id", "")
+                heading = sec.get("heading_ko") or sec.get("title", "")
+                if sid and heading and sid not in heading_map:
+                    heading_map[sid] = heading
+        except (json.JSONDecodeError, OSError):
+            pass
+    return heading_map
+
+
 def migrate_file(
     meta_path: Path,
     dry_run: bool = False,
     verbose: bool = False,
+    heading_map: dict[str, str] | None = None,
 ) -> tuple[bool, list[str]]:
     """
     단일 _meta.json 파일을 변환.
@@ -140,6 +177,14 @@ def migrate_file(
 
     # 정규화
     normalized, changes = normalize_field_names(data)
+
+    # heading_ko 보충: 필드가 완전히 없는 경우 structure_index/blueprint에서 가져옴
+    if "heading_ko" not in normalized and heading_map:
+        sid = normalized.get("section_id", "")
+        heading = heading_map.get(sid)
+        if heading:
+            normalized["heading_ko"] = heading
+            changes.append(f"  heading_ko: structure_index/blueprint에서 보충 → '{heading}'")
 
     # 필수 필드 누락 확인
     missing_fields = [f for f in REQUIRED_FIELDS if f not in normalized]
@@ -213,9 +258,14 @@ def main() -> None:
         print(f"변환 대상 파일 없음: {drafts_dir}")
         raise SystemExit(0)
 
+    # heading_ko 보충용 매핑 로드
+    heading_map = _load_heading_map(workspace)
+
     mode_label = "[DRY-RUN]" if args.dry_run else "[APPLY]"
     print(f"{mode_label} 시작 — 작업 디렉토리: {workspace}")
     print(f"  대상 파일: {len(meta_files)}개")
+    if heading_map:
+        print(f"  heading 보충 소스: {len(heading_map)}개 섹션")
 
     total_changed = 0
     total_unchanged = 0
@@ -225,6 +275,7 @@ def main() -> None:
             meta_path,
             dry_run=args.dry_run,
             verbose=args.verbose,
+            heading_map=heading_map,
         )
         if changed:
             total_changed += 1

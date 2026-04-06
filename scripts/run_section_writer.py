@@ -868,6 +868,16 @@ def write_single_section(
 
             # 메타 보강
             meta["section_id"] = section_id
+            # heading_ko: fallback 경로에서도 structure_index/blueprint에서 가져옴
+            if not meta.get("heading_ko"):
+                _heading = (
+                    (section_entry or {}).get("heading_ko")
+                    or (section_entry or {}).get("heading_text")
+                    or (section_blueprint or {}).get("heading_ko")
+                    or (section_blueprint or {}).get("title")
+                )
+                if _heading:
+                    meta["heading_ko"] = _heading
             meta["workspace"] = str(workspace)
             meta["generated_at"] = utc_now()
             meta["agent"] = "section-writer"
@@ -970,6 +980,19 @@ def write_single_section(
 
             # 메타 보강
             meta["section_id"] = section_id
+            # heading_ko: LLM 출력 → structure_index → blueprint 순 fallback
+            if not meta.get("heading_ko"):
+                _heading = (
+                    meta.get("heading_text")
+                    or meta.get("section_title")
+                    or meta.get("title")
+                    or (section_entry or {}).get("heading_ko")
+                    or (section_entry or {}).get("heading_text")
+                    or (section_blueprint or {}).get("heading_ko")
+                    or (section_blueprint or {}).get("title")
+                )
+                if _heading:
+                    meta["heading_ko"] = _heading
             meta["draft_version"] = meta.get("draft_version", 1)
             meta["draft_confidence"] = estimate_confidence(meta, body)
             # backward compatibility: confidence 필드도 동일 값

@@ -79,21 +79,35 @@ def _extract_placeholder_strings(placeholders) -> list[str]:
 
 
 def _load_blueprint_heading_map(workspace: Path) -> dict[str, str]:
-    """writing_blueprint.json에서 section_id -> 제목 매핑을 읽는다."""
-    blueprint_path = workspace / "05_planning" / "writing_blueprint.json"
-    if not blueprint_path.exists():
-        return {}
-    try:
-        blueprint = json.loads(blueprint_path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
-        return {}
-
+    """writing_blueprint.json + structure_index.json에서 section_id -> 제목 매핑을 읽는다."""
     heading_map: dict[str, str] = {}
-    for sec in blueprint.get("sections", []):
-        sid = sec.get("section_id")
-        heading = sec.get("heading_ko") or sec.get("heading_text")
-        if sid and heading:
-            heading_map[sid] = heading
+
+    # 1차 소스: structure_index (가장 정확)
+    si_path = workspace / "05_planning" / "structure_index.json"
+    if si_path.is_file():
+        try:
+            si = json.loads(si_path.read_text(encoding="utf-8"))
+            for entry in si.get("entries", []):
+                sid = entry.get("section_id")
+                heading = entry.get("heading_ko") or entry.get("heading_text")
+                if sid and heading:
+                    heading_map[sid] = heading
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    # 2차 소스: writing_blueprint (structure_index에 없는 것만 보충)
+    blueprint_path = workspace / "05_planning" / "writing_blueprint.json"
+    if blueprint_path.is_file():
+        try:
+            blueprint = json.loads(blueprint_path.read_text(encoding="utf-8"))
+            for sec in blueprint.get("sections", []):
+                sid = sec.get("section_id")
+                heading = sec.get("heading_ko") or sec.get("heading_text")
+                if sid and heading and sid not in heading_map:
+                    heading_map[sid] = heading
+        except (json.JSONDecodeError, OSError):
+            pass
+
     return heading_map
 
 
