@@ -43,6 +43,7 @@ logs/
 events.jsonl
 runs.json
 incidents.json
+llm/call_log.jsonl
 *.bak
 
 # Environment variables
