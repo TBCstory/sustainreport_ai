@@ -130,6 +130,7 @@ uv run sustainreport approve P5_to_P6 --workspace workspaces/PRJ-2026-0402-ESG00
 가까운 범위의 현실적인 개선 영역은 다음과 같습니다.
 
 - 더 안정적인 CLI smoke test와 회귀 테스트 보강
+- repository-wide Ruff 정리와 점진적인 lint 기준 확대
 - 프레임워크 매핑 검증 규칙과 fixture 품질 개선
 - 상태 요약, 게이트 안내, 핸드오프 산출물의 일관성 향상
 - 공개 저장소에 적합한 synthetic/scrubbed 예제 자료와 문서 강화

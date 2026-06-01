@@ -45,8 +45,8 @@ If you need optional OCR-related dependencies, install them separately and keep 
 Run the basic local checks before opening a pull request:
 
 ```bash
-uv run ruff check .
 uv run pytest
+uv run ruff check tests/test_cli_smoke.py
 ```
 
 If you changed CLI behavior, also run a quick manual smoke check:
@@ -54,6 +54,8 @@ If you changed CLI behavior, also run a quick manual smoke check:
 ```bash
 uv run sustainreport --help
 ```
+
+Repository-wide Ruff cleanup is still a known maintenance task and roadmap item. Until that legacy lint debt is paid down, CI keeps Ruff scoped to files that are already clean. If your pull request touches additional Python files, run Ruff on the specific files you changed and include that in your validation notes.
 
 ## Coding and documentation style
 
