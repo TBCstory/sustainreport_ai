@@ -32,13 +32,17 @@ ENV/
 *.swp
 *.swo
 *~
+.claude/worktrees/
 
 # Project specific
 workspaces/
+context_bus/
+logs/
 *.tmp
 *.log
 events.jsonl
 runs.json
+incidents.json
 *.bak
 
 # Environment variables
@@ -52,5 +56,7 @@ Thumbs.db
 
 # Testing
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
 .coverage
 htmlcov/
